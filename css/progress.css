@@ -1,0 +1,190 @@
+:root {
+    --tlt-br-cnt: 50;
+    --i: 0;
+}
+.result {
+    display: flex;
+    justify-content: space-around;
+    width: 70%;
+}
+.result .progress {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+}
+.result .progress span{
+    font-size: 14px;
+    margin-top: 8px;
+    position: absolute;
+}
+.result .progress h4.speed{
+    color: #98d4f1;
+}
+.result .progress h4.acc{
+    color: #bef1b3;
+}
+.result .progress span.req-speed{ 
+    position: absolute;
+    right: -130px;
+    bottom: 0;
+    color: #868d97;
+}
+.result .progress i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: rotate(calc(45deg + calc(calc(360deg / var(--tlt-br-cnt)) * var(--i))));
+}
+.result .progress .info{ 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.result .progress i::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: hsla(0, 0%,100%, 12%);;
+    width: 5px;
+    height: 20px;
+    border-radius: 999rem;
+    transform: rotate(-45deg);
+    transform-origin: top;
+    opacity: 0;
+
+    animation: barCreationAnimation 100ms ease forwards;
+    animation-delay: calc(var(--i) * 15ms);
+}
+
+.result .progress .selected1::after {
+    background: hsl(130, 100%, 50%);
+    box-shadow: 0 0 1px hsl(130, 100%, 50%),
+                0 0 3px hsl(130, 100%, 30%),
+                0 0 4px hsl(130, 100%, 10%);
+}
+
+.result .progress .selected2::after {
+    background: hsl(64, 100%, 50%);
+    box-shadow: 0 0 1px hsl(64, 100%, 50%),
+                0 0 3px hsl(64, 100%, 30%),
+                0 0 4px hsl(64, 100%, 10%);
+}
+
+.result .progress .selected3::after {
+    background: hsl(199, 100%, 50%);
+    box-shadow: 0 0 1px hsl(199, 100%, 50%),
+                0 0 3px hsl(199, 100%, 30%),
+                0 0 4px hsl(199, 100%, 10%);
+}
+
+.percent-text {
+    font-size: 3rem;
+    animation: barCreationAnimation 500ms ease forwards;
+    animation-delay: calc(var(--tlt-br-cnt) * 15ms / 2);
+}
+
+.text1{
+    color: hsl(130, 100%, 50%);
+    text-shadow: 0 0 1px hsl(130, 100%, 50%),
+                    0 0 3px hsl(130, 100%, 30%),
+                    0 0 4px hsl(130, 100%, 10%);
+    opacity: 0;
+}
+
+.text2{
+    color: hsl(64, 100%, 50%);
+    text-shadow: 0 0 1px hsl(64, 100%, 50%),
+                0 0 3px hsl(64, 100%, 30%),
+                0 0 4px hsl(64, 100%, 10%);
+    opacity: 0;
+}
+.text3{
+    color: hsl(199, 100%, 50%);
+    text-shadow: 0 0 1px hsl(199, 100%, 50%),
+    0 0 3px hsl(199, 100%, 30%),
+    0 0 4px hsl(199, 100%, 10%);
+    opacity: 0;
+}
+
+@keyframes barCreationAnimation {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.result div.time {
+    width: 160px;
+    height: 160px;
+    background-color: transparent;
+    border: 10px solid rgb(224, 222, 222);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -50px;
+    position: relative;
+}
+.result div.time::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    width: 80%;
+    height: 80%;
+    border: 7px solid rgb(158, 158, 158);
+    background-color: transparent;
+    border-radius: 50%;
+}
+.result .time .info{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.result .time .info span{
+    font-size: 18px;
+    font-family: fantasy;
+}
+.result .time .info span.time{
+    font-size: 35px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

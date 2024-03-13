@@ -1,83 +1,189 @@
+// declaration
+let lessonData;
 let lessonInfo = {
-    name: 'Pleasure',
-    text: `You can acount the pleasure entire the world as you can. people always taken other people in a park, but that not happen with me. You can acount the pleasure entire the world as you can.`,
-    level: 1,
-    stars: 0,
+    name: '',
+    text: '',
+    level: 0,
     speed: 0,
+    require_speed: 0,
     accuracy: 0,
 };
+
+let words;
+let totalLetters;
+let lines = [];
+let tokens = [];
+let cur_line;
+let cur_token;
+let cur_letter;
 let KeyboardLetters = document.querySelectorAll(
     '.keyboard .edc-st1.edc-st2.bld'
 );
-let words = lessonInfo.text.split(' ');
 let activeKeyLetter;
 let wrongLetter;
 let correctLetter;
-let lines = [];
-let tokens = [];
 let indexes = { cur_line_index: 0, cur_token_index: 0, cur_letter_index: 0 };
-let cur_line;
 // let cur_token_index_in_line = 0;
 let holderIndexToken = 0;
-const fixedUpDown = 73.76;
+const fixedUpDownS = 0.76;
+const fixedUpDown = 73 + fixedUpDownS;
 let margintop = 0;
 let canType = true;
 let canBack = false;
-let cur_token;
-let cur_letter;
 let keydown = 0;
-let totalLetters = lessonInfo.text.length;
+let wrongLettersCount = 0;
+let rightLettersCount = 0;
+let accuracy = 0;
+let speed = 0;
+let duration = 0.0;
+let seconds = 0;
+let durationCounter;
+let started = false;
 let shiftRightKey = document.querySelectorAll('.shift-right');
 let shiftLeftKey = document.querySelectorAll('.shift-left');
 let neutralRight = document.getElementById('neutral-right');
 let neutralLeft = document.getElementById('neutral-left');
 let text_container = document.querySelector('.text-container.typable');
-let progress = document.querySelector('.progress');
+let progress = document.querySelector('#progress');
+let lowAcurracyPopup = document.querySelector('.low-accuracy');
+let resultScreen = document.querySelector('.end-lesson');
+let timeRsult = document.querySelector('.result .time .info .time');
+let starsHolder = document.querySelectorAll('.end-lesson .popup .rate i');
+let nextButton = document.querySelector('.end-lesson .popup button.next');
+let prevButton = document.querySelector('.end-lesson .popup button.prev');
+let congrats = document.querySelector('.end-lesson .popup p.final-word');
+let wait = null;
+let storeLessonData;
 
+getLesson(lessonInfo);
+function getLesson(lessonObj) {
+    let myRequest = new XMLHttpRequest();
+    myRequest.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            let handleLessons = JSON.parse(this.responseText);
+            if (localStorage.lesson_number) {
+                lessonData = handleLessons.lessons[localStorage.lesson_number];
+            } else {
+                lessonData = handleLessons.lessons[handleLessons.lesson_id];
+                localStorage.setItem('lesson_number', 0);
+            }
+            // print(lessonData);
+            lessonObj.name = lessonData.name;
+            lessonObj.text = lessonData.text;
+            lessonObj.level = lessonData.level;
+            lessonObj.stars = lessonData.stars;
+            lessonObj.speed = lessonData.speed;
+            lessonObj.require_speed = lessonData.require_speed;
+            lessonObj.accuracy = lessonData.accuracy;
+            words = lessonObj.text.split(' ');
+            totalLetters = lessonObj.text.length;
+            generateLesson(lessonObj);
+            cur_line = lines[0];
+            cur_token = tokens[0];
+            cur_letter = cur_token.children[0];
+            setLetter(cur_letter.textContent);
+            cur_letter.classList.add('cur');
+        }
+    };
+
+    myRequest.open('GET', '/js/lessons.json', true);
+    myRequest.send();
+}
+
+function restartLesson() {
+    lowAcurracyPopup.classList.contains('active')
+        ? lowAcurracyPopup.classList.remove('active')
+        : null;
+    holderIndexToken = 0;
+    margintop = 0;
+    tokens = [];
+    indexes = { cur_line_index: 0, cur_token_index: 0, cur_letter_index: 0 };
+    canType = true;
+    canBack = false;
+    keydown = 0;
+    wrongLettersCount = 0;
+    rightLettersCount = 0;
+    accuracy = 0;
+    seconds = 0;
+    speed = 0;
+    duration = 0.0;
+    started = false;
+    wait = null;
+    getLesson(lessonInfo);
+    text_container.style.marginTop = '0';
+    resultScreen.classList.remove('active');
+    const wrapper = document.querySelectorAll('.result .progress');
+    wrapper.forEach(w => w.innerHTML = '');
+    congrats.innerHTML = '';
+    starsHolder.forEach(s => s.classList.remove('filled'));
+    increaseProgress();
+}
 
 const typeSound = new AudioContext();
 
-function typeSoundStart(){
-// Load the sound file asynchronously
-fetch('../js/sounds/typewriter.mp3')
-    .then((response) => response.arrayBuffer())
-    .then((arrayBuffer) => typeSound.decodeAudioData(arrayBuffer))
-    .then((audioBuffer) => {
-        const source = typeSound.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(typeSound.destination);
-        source.start(); // Play the sound
-    });
+function typeSoundStart() {
+    // Load the sound file asynchronously
+    fetch('../js/sounds/typewriter.mp3')
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => typeSound.decodeAudioData(arrayBuffer))
+        .then((audioBuffer) => {
+            const source = typeSound.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(typeSound.destination);
+            source.start(); // Play the sound
+        });
 }
 const errorSound = new AudioContext();
 
-function errorSoundStart(){
-// Load the sound file asynchronously
-fetch('../js/sounds/error.mp3')
-    .then((response) => response.arrayBuffer())
-    .then((arrayBuffer) => errorSound.decodeAudioData(arrayBuffer))
-    .then((audioBuffer) => {
-        const source = errorSound.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(errorSound.destination);
-        source.start(); // Play the sound
-    });
+function errorSoundStart() {
+    // Load the sound file asynchronously
+    fetch('../js/sounds/error.mp3')
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => errorSound.decodeAudioData(arrayBuffer))
+        .then((audioBuffer) => {
+            const source = errorSound.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(errorSound.destination);
+            source.start(); // Play the sound
+        });
 }
+const starSound = new AudioContext();
 
-
-generateLesson(lessonInfo);
-cur_line = lines[0];
-cur_token = tokens[0];
-cur_letter = cur_token.children[0];
-setLetter(cur_letter.textContent);
-cur_letter.classList.add('cur');
-
-
+function StarSoundStart() {
+    // Load the sound file asynchronously
+    fetch('../js/sounds/success_bell-6776 (1).mp3')
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => errorSound.decodeAudioData(arrayBuffer))
+        .then((audioBuffer) => {
+            const source = errorSound.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(errorSound.destination);
+            source.start(); // Play the sound
+        });
+}
 
 window.addEventListener('keydown', (e) => {
     if (!canType) {
         e.preventDefault();
         return;
+    }
+    if (!canBack) {
+        stopTyping();
+    } else if (!started) {
+        startTyping();
+    }
+    let i = 0;
+    if (wait !== null) {
+        clearInterval(wait);
+        wait = null;
+    } else {
+        wait = setInterval(() => {
+            i++;
+            if (i === 5) {
+                stopTyping();
+                clearInterval(wait);
+            }
+        }, 1000);
     }
     // print(e.key);
     if (
@@ -100,7 +206,7 @@ window.addEventListener('keydown', (e) => {
         e.key !== 'Clear' &&
         e.key !== 'MediaPlayPause' &&
         e.key !== 'MediaTrackNext' &&
-        e.key !== 'MediaTrackPrevious' && 
+        e.key !== 'MediaTrackPrevious' &&
         e.key !== 'AudioVolumeUp' &&
         e.key !== 'AudioVolumeDown' &&
         e.key !== 'Alt'
@@ -111,25 +217,109 @@ window.addEventListener('keydown', (e) => {
     } else if (e.key === 'Backspace' && canBack) {
         backspace();
     }
+    if (wrongLettersCount >= 35) {
+        lowAcurracy();
+    }
     e.preventDefault();
 });
+
+function lowAcurracy() {
+    canBack = false;
+    canType = false;
+    lowAcurracyPopup.classList.add('active');
+}
+/*
+1 Star (Very Weak): "Meh, it could be better." (Lowers expectations)
+
+2 Stars (Mediocre): "Not bad, but there's room for improvement." (Constructive criticism)
+
+3 Stars (Average): "Good job! You did the basics well." (Acknowledgement of effort)
+
+4 Stars (Very Good): "Impressive! This is a solid achievement." (Highlights quality)
+
+5 Stars (Excellent): "Outstanding! You absolutely nailed it!" (Enthusiastic praise)
+*/
+let congStatement = [
+    "<b>Don't give up!</b> There's always another chance to shine.",
+    '<b>Meh,</b> it could be better.',
+    "<b>Not bad</b>, but there's room for improvement.",
+    '<b>Good job!</b> You did the basics well.',
+    '<b>Impressive!</b> This is a solid achievement.',
+    '<b>Outstanding!</b> You absolutely nailed it!',
+];
+function showResult() {
+    let starsCount = 0;
+    Math.floor(accuracy) == 100 ? starsCount++ : (starsCount = 0);
+    speed >= lessonInfo.require_speed && speed < lessonInfo.require_speed + 2
+        ? (starsCount += 2)
+        : speed < lessonInfo.require_speed + 5 &&
+            speed > lessonInfo.require_speed + 2
+        ? (starsCount += 3)
+        : speed > lessonInfo.require_speed + 5
+        ? (starsCount += 4)
+            : (starsCount = 0);
+    congrats.innerHTML = congStatement[starsCount];
+    let index = 0;
+    if (starsCount > 0) {
+        let setStars = setInterval(() => {
+            starsHolder[index++].classList.add('filled');
+            StarSoundStart();
+            starsCount--;
+            if (starsCount < 1) {
+                clearInterval(setStars);
+            }
+        }, 500);
+        enabledButton(nextButton);
+    } else {
+        disabledButton(nextButton);
+    }
+    if (localStorage.lesson_number <= 0)
+    {
+        disabledButton(prevButton);
+    } else {
+        enabledButton(prevButton);
+    }
+    let minutes = Math.floor(seconds / 60);
+    let second = seconds % 60;
+    timeRsult.innerHTML = `${minutes}:${second < 10 ? `0${second}` : second}`;
+    const wrapper = document.querySelectorAll('.result .progress');
+
+    const barCount = 50;
+    const percent1 = (50 * Math.round(accuracy)) / 100;
+    const percent3 =
+        (lessonInfo.require_speed * speed) / lessonInfo.require_speed + 10;
+
+    for (let index = 0; index < barCount; index++) {
+        const className = index < percent1 ? 'selected1' : '';
+        wrapper[0].innerHTML += `<i style="--i: ${index};" class="${className}"></i>`;
+    }
+
+    wrapper[0].innerHTML += `<div class='info'><p class="selected percent-text text1">${Math.floor(
+        accuracy
+    )}<span>%</span></p><h4 class="acc">Accuracy</h4></div>`;
+
+    for (let index = 0; index < barCount; index++) {
+        const className = index < percent3 ? 'selected3' : '';
+        wrapper[1].innerHTML += `<i style="--i: ${index};" class="${className}"></i>`;
+    }
+
+    wrapper[1].innerHTML += `<div class='info'>
+    <p class="selected percent-text text3">${speed}<span>wpm</span></p>
+    <h4 class="speed">Speed</h4>
+    <span class="req-speed">Required: ${lessonInfo.require_speed} wpm</span>
+    </div>`;
+}
 function checkInput(inputLetter) {
     cur_letter.classList.remove('cur');
-     if (
-        inputLetter === 'Tab' ||
-        inputLetter === 'Enter'
-    ) {
+    if (inputLetter === 'Tab' || inputLetter === 'Enter') {
         setWrongLetter(inputLetter.toLowerCase());
-     }
-     else {
+    } else {
         if (inputLetter === cur_letter.textContent) {
             setCorrectLetter(inputLetter.toLowerCase());
             if (cur_letter.classList.contains('e-v'))
                 cur_letter.classList.add('err-vld');
-            else
-                cur_letter.classList.add('vld');
-        } else if (inputLetter === 'space' &&
-            cur_letter.innerHTML.length > 1) {
+            else cur_letter.classList.add('vld');
+        } else if (inputLetter === 'space' && cur_letter.innerHTML.length > 1) {
             setCorrectLetter(inputLetter);
             if (cur_letter.classList.contains('e-v'))
                 cur_letter.classList.add('err-vld');
@@ -143,10 +333,10 @@ function checkInput(inputLetter) {
             cur_letter = cur_token.children[letterIndex];
             if (cur_letter.innerHTML.length > 1) setLetter('space');
             else setLetter(cur_letter.textContent);
+            cur_letter.classList.add('cur');
         }
     }
-    cur_letter.classList.add('cur');
-    keydown++
+    keydown++;
     increaseProgress();
     canBack = true;
     // print(indexes);
@@ -160,11 +350,17 @@ function backspace() {
     if (canBack) {
         typeSoundStart();
         cur_letter = cur_token.children[letterIndex];
-        if (cur_letter.classList.contains('err')) { cur_letter.classList.add('e-v'); }
-        cur_letter.classList.contains('vld')
-            ? cur_letter.classList.remove('vld'):'';
+        if (cur_letter.classList.contains('err')) {
+            cur_letter.classList.add('e-v');
+            wrongLettersCount--;
+        }
+        if (cur_letter.classList.contains('vld')) {
+            cur_letter.classList.remove('vld');
+            rightLettersCount--;
+        }
         cur_letter.classList.contains('err')
-            ? cur_letter.classList.remove('err'):'';
+            ? cur_letter.classList.remove('err')
+            : '';
         cur_letter.classList.contains('err-vld')
             ? cur_letter.classList.remove('err-vld')
             : '';
@@ -176,11 +372,11 @@ function backspace() {
     }
 }
 function increaseProgress() {
-    progress.style.width = `${((keydown / totalLetters) * 100)}%`;
+    progress.style.width = `${(keydown / totalLetters) * 100}%`;
 }
 function increaseLetterIndex() {
     const length = cur_token.children.length;
-    if (((indexes.cur_letter_index + 1) % cur_token.children.length) == 0) {
+    if ((indexes.cur_letter_index + 1) % cur_token.children.length == 0) {
         let tokenIndex = ++indexes.cur_token_index;
         if (tokenIndex < tokens.length) {
             cur_token = tokens[tokenIndex];
@@ -198,34 +394,31 @@ function increaseLetterIndex() {
     }
     if (
         cur_token == tokens[tokens.length - 1] &&
-        indexes.cur_letter_index == cur_token.children.length -1
+        indexes.cur_letter_index == cur_token.children.length - 1
     ) {
         endLesson();
     }
-    return (
-        indexes.cur_letter_index = (indexes.cur_letter_index + 1) %
-        length
-    );
+    return (indexes.cur_letter_index = (indexes.cur_letter_index + 1) % length);
 }
 function downText() {
     let start = 0;
-    let slowly = setInterval(() => {    
+    let slowly = setInterval(() => {
         text_container.style.marginTop = `${margintop--}px`;
         start++;
         if (start >= 73) {
-            text_container.style.marginTop = `${margintop -= 0.76}px`;
+            text_container.style.marginTop = `${(margintop -= fixedUpDownS)}px`;
             clearInterval(slowly);
         }
     }, 300 / fixedUpDown);
     // margintop -= fixedUpDown;
 }
-function upText(){
+function upText() {
     let start = 0;
     let slowly = setInterval(() => {
         text_container.style.marginTop = `${margintop++}px`;
         start++;
         if (start >= 73) {
-            text_container.style.marginTop = `${(margintop += 0.76)}px`;
+            text_container.style.marginTop = `${(margintop += fixedUpDownS)}px`;
             clearInterval(slowly);
         }
     }, 300 / fixedUpDown);
@@ -252,6 +445,7 @@ function decreaseLetterIndex() {
     return index;
 }
 function setWrongLetter(wrongLet) {
+    wrongLettersCount++;
     errorSoundStart();
     setKeyWrong(wrongLet);
     incorrectLetterShow(wrongLetter);
@@ -259,10 +453,35 @@ function setWrongLetter(wrongLet) {
         incorrectLetterHide(wrongLetter);
     }, 200);
 }
+
 function endLesson() {
+    stopTyping();
     canType = false;
+    resultScreen.classList.add('active');
+    showResult();
+}
+function nextLesson() {
+    if(localStorage.lesson_number <= 70)
+    localStorage.lesson_number++;
+    else {
+        disabledButton(nextButton);
+    }
+    restartLesson();
+}
+function disabledButton(button) {
+    button.classList.add('disabled');
+    button.disabled = true;
+}
+function enabledButton(button) {
+    button.classList.remove('disabled');
+    button.disabled = false;
+}
+function previousLesson() {
+    localStorage.lesson_number--
+    restartLesson();
 }
 function setCorrectLetter(letter) {
+    rightLettersCount++;
     typeSoundStart();
     setKeyCorrect(letter);
     correctLetterShow(correctLetter);
@@ -292,7 +511,7 @@ function generateLesson(lessonInfo) {
     setLines();
 }
 
-window.addEventListener('resize', e => setLines());
+window.addEventListener('resize', (e) => setLines());
 
 function setLines() {
     lines = null;
@@ -325,7 +544,19 @@ function setLines() {
     // // Insert the dynamic span after the paragraph
     // paragraphContainer.appendChild(dynamicSpan);
 }
-
+function startTyping() {
+    started = true;
+    durationCounter = setInterval(() => {
+        duration += 0.0166666667;
+        seconds++;
+        accuracy = (rightLettersCount / keydown) * 100;
+        speed = Math.round((keydown / (duration * 5)) * (accuracy / 100));
+    }, 1000);
+}
+function stopTyping() {
+    started = false;
+    clearInterval(durationCounter);
+}
 function setLetter(letter) {
     // setTimeout(() => {
     if (activeKeyLetter) toggleKeyLetter(activeKeyLetter);
@@ -467,7 +698,7 @@ function unactivateLeftNeutral() {
     neutralLeft.classList.remove('active');
 }
 function activateRightNeutral() {
-        neutralRight.classList.add('active');
+    neutralRight.classList.add('active');
 }
 function unctivateRightNeutral() {
     neutralRight.classList.remove('active');

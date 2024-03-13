@@ -8,12 +8,46 @@
     <link rel="stylesheet" href="../css/all.min.css">
     <link rel="stylesheet" href="../css/index.style.css">
     <link rel="stylesheet" href="../css/lesson.style.css">
+    <link rel="stylesheet" href="../css/progress.css">
 </head>
-<body>
+<body style="font-family: courier;">
         <!-- start header -->
         <div class="header" id="header"></div>
         <!-- end header -->
         <!-- start typing-field -->
+        <div class="low-accuracy">
+            <div class="popup">
+                <p>You get low accuracy please try again and work hard.</p>
+                <button onclick="{restartLesson()}">Restart Lesson</button>
+            </div>
+        </div>
+        <div class="end-lesson">
+            <div class="popup">
+                <div class="rate">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <div class="result">
+                    <div class="progress"></div>
+                    <div class="time">
+                        <div class="info">
+                            <span class="time">0:00</span>
+                            <span>Time</span>
+                        </div>
+                    </div>
+                    <div class="progress"></div>
+                </div>
+                <p class="final-word"></p>
+                <div class="buttons">
+                    <button class="prev" onclick="{previousLesson()}"><i class="fa-solid fa-arrow-left"></i>Previous</button>
+                    <button onclick="{restartLesson()}">Restart <i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="next" onclick="{nextLesson()}">Next<i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
         <div class="typing-field">
             <div class="less-container">
                 <div class="text-field">
@@ -1802,5 +1836,6 @@
         <!-- Scripts -->
     <script src="..//js/main.js"></script>
     <script src="..//js/typing-lesson.js"></script>
+    <script src="../js/progress.js"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ function createHeader() {
                     <li><a href="../index.html">Home</a></li>
                     <li><a href="/pages/lesson.html">Lessons</a></li>
                     <li><a href="#">Games</a></li>
-                    <li><a href="#">Speed Test</a></li>
+                    <li><a href="#">Typing Test</a></li>
                 </ul>
                 <div>
                     <a href="#" class="sign"><span>Sign in</span></a>
@@ -26,7 +26,7 @@ function createHeader() {
                 <li><a href="#">Home</a></li>
                 <li><a href="/pages/lesson.html">Lessons</a></li>
                 <li><a href="#">Games</a></li>
-                <li><a href="#">Speed Test</a></li>
+                <li><a href="#">Typing Test</a></li>
                 <li><a href="#" class="sign"><span>Sign in</span></a></li>
             </ul>
         </div>
