@@ -271,6 +271,7 @@ object {
 .typing-field .less-container .text-field .text .text-container {
     margin-top: 0;
     font-variant-ligatures: none;
+    font-family: "Droid Sans Mono";
     /* animation: read-down 8s linear infinite; */
 }
 .typing-field .less-container .text-field .text .text-container span.letter {
@@ -279,6 +280,7 @@ object {
     white-space: nowrap;
     margin: 0;
     padding: 0;
+    font-weight: normal;
 }
 .typing-field .less-container .text-field .text .text-container i {
     display: inline-block;
@@ -457,7 +459,7 @@ object {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: #0c192b;
+    background-color: #16232d;
     z-index: 1000;
     display: flex;
     justify-content: center;
@@ -539,9 +541,9 @@ object {
     background-color: lightgray;
     user-select: none;
 }
-.end-lesson .popup .buttons button:first-child::after,
-.end-lesson .popup .buttons button:nth-child(2)::before,
-.end-lesson .popup .buttons button:last-child::before {
+.end-lesson .popup .buttons button.prev::after,
+.end-lesson .popup .buttons button.restart::before,
+.end-lesson .popup .buttons button.next::before {
     content: '';
     position: absolute;
     top: 0;
@@ -553,26 +555,151 @@ object {
     z-index: -1;
     mix-blend-mode: difference;
 }
-.end-lesson .popup .buttons button:first-child::after{
+.end-lesson .popup .buttons button.prev::after{
     right: 0;
 }
-.end-lesson .popup .buttons button:nth-child(2)::before{
+.end-lesson .popup .buttons button.restart::before{
     left: 50%;
     transform: translateX(-50%);
 }
-.end-lesson .popup .buttons button:last-child::before{
+.end-lesson .popup .buttons button.next::before{
     left: 0;
 }
 .end-lesson .popup .buttons button:not(.disabled):hover{
     color: white;
 }
-.end-lesson .popup .buttons button:not(.disabled):hover:first-child::after,
-.end-lesson .popup .buttons button:not(.disabled):hover:nth-child(2)::before,
-.end-lesson .popup .buttons button:not(.disabled):hover:last-child::before {
+.end-lesson .popup .buttons button.prev:not(.disabled):hover::after,
+.end-lesson .popup .buttons button.restart:not(.disabled):hover::before,
+.end-lesson .popup .buttons button.next:not(.disabled):hover::before {
     width: 100%;
 }
 .end-lesson .popup p.final-word {
     font-size: 16px;
     color: #e3e3e3;
     font-weight: bold;
+}
+#video-lesson-content {
+    display: none;
+}
+#video-lesson-content.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+#video-lesson-content .skip-button{
+    margin-top: 20px;
+    padding: 5px 20px;
+    background-color: #24293d;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    font-family: arial;
+    color: white;
+    transition: .3s;
+    box-shadow: inset 0px -2px 6px 0px #000000b8, 0px 4px 8px 0px #00000054, 4px 0px 8px 0px #0000002e;
+}
+#video-lesson-content .skip-button:hover {
+    box-shadow: inset 0px 0px 4px 0px #000000b8, 0px 0px 5px 0px #00000054, 0px 0px 5px 0px #0000002e;
+}
+.control-bar {
+    display: flex;
+    margin-top: 17px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-family: "Droid Sans Mono";
+}
+.control-bar .play{
+    font: var(--fa-font-solid);
+    font-size: 27px;
+    border: none;
+    background: transparent;
+    color: #707e93;
+    text-shadow: 2px 2px 12px #000000a6;
+}
+.control-bar .play.played::before{
+    content: '\f04c';
+}
+.control-bar .play.baused::before{
+    content: '\f04b';
+}
+.control-bar p{
+    color: #707e93;
+    text-align: left;
+    font-size: 18px;
+}
+
+
+.choose-test-level{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 12124124;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.choose-test-level.hide {
+    display: none;
+}
+.choose-test-level .container {
+    height: 100%;
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    font-family: sans-serif;
+    line-height: 1.5;
+    letter-spacing: 1.3px;
+}
+
+.choose-test-level .tl {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    background: linear-gradient(-60deg, #141319, #16202e, #141319)
+        /*linear-gradient(120deg, hsl(199, 100%, 50%), hsl(209.35deg 59.63% 56.3%), hsl(199, 100%, 50%))*/
+        ;
+    color: #f7f7f7;
+    border-radius: 6px;
+    height: 350px;
+    max-width: 250px;
+    text-align: center;
+    align-self: center;
+    transition: .3s;
+    margin: 50px auto;
+    cursor: pointer;
+}
+.choose-test-level .container div.tl:hover{
+    transform: translateY(-10px);
+}
+.choose-test-level .container .info{
+    margin: 20px;
+}
+.choose-test-level h1 {
+    width: 100%;
+    /* background: linear-gradient(120deg, hsl(199deg 100% 50% / 3%), hsl(209.35deg 59.63% 56.3% / 50%), hsl(199deg 100% 50% / 4%));; */
+    border-radius: 6px;
+    height: 30%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3e3e3e;
+    background: url('../img/Screenshot\ 2024-03-16\ 173540.png');
+    background-size: cover;
+}
+.choose-test-level h2 {
+    color: #00aeff; 
+    margin: 20px 0;
+    text-shadow: 0 0 10px hsl(199deg 100% 50% / 49%);
+
+}
+.choose-test-level p {
+    text-align: center;
+    color: #a9a9a9
 }

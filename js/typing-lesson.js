@@ -1,11 +1,13 @@
 // declaration
 let lessonData;
 let lessonInfo = {
+    type: '',
     name: '',
     text: '',
     level: 0,
     speed: 0,
     require_speed: 0,
+    to_goal: 0,
     accuracy: 0,
 };
 
@@ -25,8 +27,8 @@ let correctLetter;
 let indexes = { cur_line_index: 0, cur_token_index: 0, cur_letter_index: 0 };
 // let cur_token_index_in_line = 0;
 let holderIndexToken = 0;
-const fixedUpDownS = 0.76;
-const fixedUpDown = 73 + fixedUpDownS;
+const fixedUpDownS = 0.4;
+const fixedUpDown = 75 + fixedUpDownS;
 let margintop = 0;
 let canType = true;
 let canBack = false;
@@ -52,11 +54,21 @@ let starsHolder = document.querySelectorAll('.end-lesson .popup .rate i');
 let nextButton = document.querySelector('.end-lesson .popup button.next');
 let prevButton = document.querySelector('.end-lesson .popup button.prev');
 let congrats = document.querySelector('.end-lesson .popup p.final-word');
+let typingLessonContent = document.getElementById('typing-lesson-content');
+let videoLessonContent = document.getElementById('video-lesson-content');
+let loadingScreen = document.querySelector('.loading-screen');
+let play_bause_btn = document.querySelector('.control-bar button');
+let lessonName = document.querySelector('.control-bar p');
+
 let wait = null;
 let storeLessonData;
 
 getLesson(lessonInfo);
 function getLesson(lessonObj) {
+    loadingScreen.classList.add('active');
+    setTimeout(() => {
+        loadingScreen.classList.remove('active');
+    }, 3 * 1000);
     let myRequest = new XMLHttpRequest();
     myRequest.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
@@ -67,29 +79,53 @@ function getLesson(lessonObj) {
                 lessonData = handleLessons.lessons[handleLessons.lesson_id];
                 localStorage.setItem('lesson_number', 0);
             }
-            // print(lessonData);
+            lessonObj.type = lessonData.type;
             lessonObj.name = lessonData.name;
-            lessonObj.text = lessonData.text;
             lessonObj.level = lessonData.level;
-            lessonObj.stars = lessonData.stars;
-            lessonObj.speed = lessonData.speed;
-            lessonObj.require_speed = lessonData.require_speed;
-            lessonObj.accuracy = lessonData.accuracy;
-            words = lessonObj.text.split(' ');
-            totalLetters = lessonObj.text.length;
-            generateLesson(lessonObj);
-            cur_line = lines[0];
-            cur_token = tokens[0];
-            cur_letter = cur_token.children[0];
-            setLetter(cur_letter.textContent);
-            cur_letter.classList.add('cur');
+            lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+            if (lessonObj.type === 'video') {
+                typingLessonContent.style.display = 'none';
+                videoLessonContent.classList.add('active');
+                lessonObj.link = lessonData.link;
+                showVideo(lessonObj.link);
+            } else {
+                lessonObj.text = lessonData.text;
+                lessonObj.stars = lessonData.stars;
+                lessonObj.speed = lessonData.speed;
+                lessonObj.require_speed = lessonData.require_speed;
+                lessonObj.to_goal = lessonData.to_goal;
+                lessonObj.accuracy = lessonData.accuracy;
+                videoLessonContent.classList.remove('active');
+                typingLessonContent.style.display = 'block';
+                //
+                lessonObj.type;
+                words = lessonObj.text.split(' ');
+                totalLetters = lessonObj.text.length;
+                generateLesson(lessonObj);
+                cur_line = lines[0];
+                cur_token = tokens[0];
+                cur_letter = cur_token.children[0];
+                setLetter(cur_letter.textContent);
+                cur_letter.classList.add('cur');
+            }
         }
     };
 
     myRequest.open('GET', '/js/lessons.json', true);
     myRequest.send();
 }
-
+function showVideo(link) {
+    let video = videoLessonContent.children[0];
+    canType = false;
+    canBack = false;
+    video.setAttribute('src', link);
+    setTimeout(() => {
+        video.play();
+    }, 3 * 1000);
+    video.addEventListener('ended', () => {
+        nextLesson();
+    });
+}
 function restartLesson() {
     lowAcurracyPopup.classList.contains('active')
         ? lowAcurracyPopup.classList.remove('active')
@@ -113,9 +149,10 @@ function restartLesson() {
     text_container.style.marginTop = '0';
     resultScreen.classList.remove('active');
     const wrapper = document.querySelectorAll('.result .progress');
-    wrapper.forEach(w => w.innerHTML = '');
+    wrapper.forEach((w) => (w.innerHTML = ''));
     congrats.innerHTML = '';
-    starsHolder.forEach(s => s.classList.remove('filled'));
+    lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+    starsHolder.forEach((s) => s.classList.remove('filled'));
     increaseProgress();
 }
 
@@ -186,31 +223,7 @@ window.addEventListener('keydown', (e) => {
         }, 1000);
     }
     // print(e.key);
-    if (
-        e.key !== 'Shift' &&
-        e.key !== 'Backspace' &&
-        e.key !== 'CapsLock' &&
-        e.key !== 'Control' &&
-        e.key !== ' ' &&
-        e.key !== 'ArrowRight' &&
-        e.key !== 'ArrowLeft' &&
-        e.key !== 'ArrowUp' &&
-        e.key !== 'ArrowDown' &&
-        e.key !== 'PageDown' &&
-        e.key !== 'PageUp' &&
-        e.key !== 'Insert' &&
-        e.key !== 'Home' &&
-        e.key !== 'End' &&
-        e.key !== 'Delete' &&
-        e.key !== 'NumLock' &&
-        e.key !== 'Clear' &&
-        e.key !== 'MediaPlayPause' &&
-        e.key !== 'MediaTrackNext' &&
-        e.key !== 'MediaTrackPrevious' &&
-        e.key !== 'AudioVolumeUp' &&
-        e.key !== 'AudioVolumeDown' &&
-        e.key !== 'Alt'
-    ) {
+    if (checkNotForbiddenLetter(e.key)) {
         checkInput(e.key);
     } else if (e.key === ' ') {
         checkInput('space');
@@ -227,6 +240,46 @@ function lowAcurracy() {
     canBack = false;
     canType = false;
     lowAcurracyPopup.classList.add('active');
+}
+function checkNotForbiddenLetter(key) {
+    // print(key);
+    return (
+        key !== 'Shift' &&
+        key !== 'Backspace' &&
+        key !== 'CapsLock' &&
+        key !== 'Control' &&
+        key !== ' ' &&
+        key !== 'ArrowRight' &&
+        key !== 'ArrowLeft' &&
+        key !== 'ArrowUp' &&
+        key !== 'ArrowDown' &&
+        key !== 'PageDown' &&
+        key !== 'PageUp' &&
+        key !== 'Insert' &&
+        key !== 'Home' &&
+        key !== 'End' &&
+        key !== 'Delete' &&
+        key !== 'NumLock' &&
+        key !== 'Clear' &&
+        key !== 'MediaPlayPause' &&
+        key !== 'MediaTrackNext' &&
+        key !== 'MediaTrackPrevious' &&
+        key !== 'AudioVolumeUp' &&
+        key !== 'AudioVolumeDown' &&
+        key !== 'Alt' &&
+        key !== 'F12' &&
+        key !== 'F11' &&
+        key !== 'F10' &&
+        key !== 'F9' &&
+        key !== 'F8' &&
+        key !== 'F7' &&
+        key !== 'F6' &&
+        key !== 'F5' &&
+        key !== 'F4' &&
+        key !== 'F3' &&
+        key !== 'F2' &&
+        key !== 'Escape'
+    );
 }
 /*
 1 Star (Very Weak): "Meh, it could be better." (Lowers expectations)
@@ -250,14 +303,17 @@ let congStatement = [
 function showResult() {
     let starsCount = 0;
     Math.floor(accuracy) == 100 ? starsCount++ : (starsCount = 0);
-    speed >= lessonInfo.require_speed && speed < lessonInfo.require_speed + 2
+    speed >= lessonInfo.require_speed && speed < lessonInfo.require_speed + 3
+        ? (starsCount += 1)
+        : speed >= lessonInfo.require_speed + 3 &&
+          speed < lessonInfo.require_speed + 7
         ? (starsCount += 2)
-        : speed < lessonInfo.require_speed + 5 &&
-            speed > lessonInfo.require_speed + 2
+        : speed >= lessonInfo.require_speed + 7 &&
+          speed < lessonInfo.require_speed + lessonInfo.to_goal
         ? (starsCount += 3)
-        : speed > lessonInfo.require_speed + 5
+        : speed >= lessonInfo.require_speed + lessonInfo.to_goal
         ? (starsCount += 4)
-            : (starsCount = 0);
+        : (starsCount = 0);
     congrats.innerHTML = congStatement[starsCount];
     let index = 0;
     if (starsCount > 0) {
@@ -273,8 +329,7 @@ function showResult() {
     } else {
         disabledButton(nextButton);
     }
-    if (localStorage.lesson_number <= 0)
-    {
+    if (localStorage.lesson_number <= 0) {
         disabledButton(prevButton);
     } else {
         enabledButton(prevButton);
@@ -285,9 +340,10 @@ function showResult() {
     const wrapper = document.querySelectorAll('.result .progress');
 
     const barCount = 50;
-    const percent1 = (50 * Math.round(accuracy)) / 100;
+    const percent1 = (barCount * Math.round(accuracy)) / 100;
+    const speedBarCount = lessonInfo.require_speed + 10;
     const percent3 =
-        (lessonInfo.require_speed * speed) / lessonInfo.require_speed + 10;
+        /*lessonInfo.require_speed*/ (barCount * speed) / speedBarCount;
 
     for (let index = 0; index < barCount; index++) {
         const className = index < percent1 ? 'selected1' : '';
@@ -306,13 +362,17 @@ function showResult() {
     wrapper[1].innerHTML += `<div class='info'>
     <p class="selected percent-text text3">${speed}<span>wpm</span></p>
     <h4 class="speed">Speed</h4>
-    <span class="req-speed">Required: ${lessonInfo.require_speed} wpm</span>
+    <span class="goal">Goal: ${
+        lessonInfo.require_speed + lessonInfo.to_goal
+    } wpm</span>
+    <span class="req-speed">Min Speed: ${lessonInfo.require_speed} wpm</span>
     </div>`;
 }
 function checkInput(inputLetter) {
     cur_letter.classList.remove('cur');
     if (inputLetter === 'Tab' || inputLetter === 'Enter') {
         setWrongLetter(inputLetter.toLowerCase());
+        cur_letter.classList.add('err');
     } else {
         if (inputLetter === cur_letter.textContent) {
             setCorrectLetter(inputLetter.toLowerCase());
@@ -328,13 +388,13 @@ function checkInput(inputLetter) {
             setWrongLetter(inputLetter.toLowerCase());
             cur_letter.classList.add('err');
         }
-        let letterIndex = increaseLetterIndex();
-        if (canType) {
-            cur_letter = cur_token.children[letterIndex];
-            if (cur_letter.innerHTML.length > 1) setLetter('space');
-            else setLetter(cur_letter.textContent);
-            cur_letter.classList.add('cur');
-        }
+    }
+    let letterIndex = increaseLetterIndex();
+    if (canType) {
+        cur_letter = cur_token.children[letterIndex];
+        if (cur_letter.innerHTML.length > 1) setLetter('space');
+        else setLetter(cur_letter.textContent);
+        cur_letter.classList.add('cur');
     }
     keydown++;
     increaseProgress();
@@ -394,7 +454,7 @@ function increaseLetterIndex() {
     }
     if (
         cur_token == tokens[tokens.length - 1] &&
-        indexes.cur_letter_index == cur_token.children.length - 1
+        cur_letter == cur_token.children[cur_token.children.length - 1]
     ) {
         endLesson();
     }
@@ -405,7 +465,7 @@ function downText() {
     let slowly = setInterval(() => {
         text_container.style.marginTop = `${margintop--}px`;
         start++;
-        if (start >= 73) {
+        if (start >= 75) {
             text_container.style.marginTop = `${(margintop -= fixedUpDownS)}px`;
             clearInterval(slowly);
         }
@@ -417,7 +477,7 @@ function upText() {
     let slowly = setInterval(() => {
         text_container.style.marginTop = `${margintop++}px`;
         start++;
-        if (start >= 73) {
+        if (start >= 75) {
             text_container.style.marginTop = `${(margintop += fixedUpDownS)}px`;
             clearInterval(slowly);
         }
@@ -453,7 +513,31 @@ function setWrongLetter(wrongLet) {
         incorrectLetterHide(wrongLetter);
     }, 200);
 }
-
+function play() {
+    /* <i class="fa-solid fa-play"></i><i class="fa-solid fa-pause"></i> */
+    play_bause_btn.classList.add('played');
+    play_bause_btn.classList.remove('baused');
+    started = true;
+    durationCounter = setInterval(() => {
+        duration += 0.0166666667;
+        seconds++;
+        accuracy = (rightLettersCount / keydown) * 100;
+        speed = Math.round((keydown / (duration * 5)) * (accuracy / 100));
+    }, 1000);
+}
+function bause() {
+    play_bause_btn.classList.remove('played');
+    play_bause_btn.classList.add('baused');
+    started = false;
+    clearInterval(durationCounter);
+}
+function playBause() {
+    if (started) {
+        bause();
+    } else {
+        play();
+    }
+}
 function endLesson() {
     stopTyping();
     canType = false;
@@ -461,8 +545,11 @@ function endLesson() {
     showResult();
 }
 function nextLesson() {
-    if(localStorage.lesson_number <= 70)
-    localStorage.lesson_number++;
+    if (videoLessonContent.classList.contains('active')) {
+        videoLessonContent.classList.remove('active');
+        videoLessonContent.children[0].pause();
+    }
+    if (localStorage.lesson_number <= 615) localStorage.lesson_number++;
     else {
         disabledButton(nextButton);
     }
@@ -477,7 +564,7 @@ function enabledButton(button) {
     button.disabled = false;
 }
 function previousLesson() {
-    localStorage.lesson_number--
+    localStorage.lesson_number--;
     restartLesson();
 }
 function setCorrectLetter(letter) {
@@ -489,7 +576,6 @@ function setCorrectLetter(letter) {
         correctLetterHide(correctLetter);
     }, 200);
 }
-
 function generateLesson(lessonInfo) {
     const line = document.createElement('span');
     line.classList.add('line');
@@ -545,17 +631,10 @@ function setLines() {
     // paragraphContainer.appendChild(dynamicSpan);
 }
 function startTyping() {
-    started = true;
-    durationCounter = setInterval(() => {
-        duration += 0.0166666667;
-        seconds++;
-        accuracy = (rightLettersCount / keydown) * 100;
-        speed = Math.round((keydown / (duration * 5)) * (accuracy / 100));
-    }, 1000);
+    play();
 }
 function stopTyping() {
-    started = false;
-    clearInterval(durationCounter);
+    bause();
 }
 function setLetter(letter) {
     // setTimeout(() => {

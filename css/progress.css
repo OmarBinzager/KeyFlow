@@ -7,15 +7,14 @@
     justify-content: space-around;
     width: 70%;
 }
+
 .result .progress {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     position: relative;
 }
 .result .progress span{
@@ -29,11 +28,19 @@
 .result .progress h4.acc{
     color: #bef1b3;
 }
-.result .progress span.req-speed{ 
-    position: absolute;
-    right: -130px;
-    bottom: 0;
+.result .progress span {
+    font-size: 12px;
     color: #868d97;
+    position: absolute;
+}
+.result .progress span.req-speed{ 
+    right: -115px;
+    bottom: 0;
+
+}
+.result .progress span.goal{ 
+    right: -90px;
+    top: 0;
 }
 .result .progress i {
     position: absolute;

@@ -3,19 +3,16 @@ function createHeader() {
     header.innerHTML = `
         <div class="blur"></div>
         <div class="container">
-            <div class="logo">
+            <div class="logo"  style="font-family: courier;">
                 <h2>Key<span>Flow</span></h2>
             </div>
             <div class="nav">
                 <ul>
-                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../../index.html">Home</a></li>
                     <li><a href="/pages/lesson.html">Lessons</a></li>
-                    <li><a href="#">Games</a></li>
-                    <li><a href="#">Typing Test</a></li>
+                    <li><a href="../pages/ZType/index.html">Game</a></li>
+                    <li><a href="/pages/TypingTest.html">Typing Test</a></li>
                 </ul>
-                <div>
-                    <a href="#" class="sign"><span>Sign in</span></a>
-                </div>
                 <div class="toggle">
                     <i class="fas fa-bars toggle-menu"></i>
                 </div>
@@ -25,9 +22,8 @@ function createHeader() {
             <ul>
                 <li><a href="#">Home</a></li>
                 <li><a href="/pages/lesson.html">Lessons</a></li>
-                <li><a href="#">Games</a></li>
-                <li><a href="#">Typing Test</a></li>
-                <li><a href="#" class="sign"><span>Sign in</span></a></li>
+                <li><a href="../pages/ZType/index.html">Game</a></li>
+                <li><a href="/pages/TypingTest.html">Typing Test</a></li>
             </ul>
         </div>
     `;
@@ -50,7 +46,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-document.addEventListener('scroll',() => {
+document.addEventListener('scroll', () => {
     if (window.scrollY >= '100') {
         header.classList.remove('show');
         header.classList.add('disappear');

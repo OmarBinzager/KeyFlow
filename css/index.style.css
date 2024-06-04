@@ -1,11 +1,11 @@
 
 /* Start Variables */
 :root {
-    --main-color: rgb(0 35 132);
+    --main-color: hsl(199, 100%, 50%);
     --shadow-color: rgba(24,
         68,
         191, 0.5);
-    --secondary-color: rgb(24, 68, 191);
+    --secondary-color: hsl(199, 100%, 50%) /*#0a6bf9*/;
     --third-color: rgb(58, 95, 196);
     --main-transition: .3s;
 
@@ -27,8 +27,7 @@ html {
 }
 
 body {
-    font-family: "Droid Sans Mono",
-        courier;;
+    font-family: "Droid Sans Mono";
 }
 
 ul {
@@ -77,6 +76,7 @@ a {
     z-index: 1000;
     width:100%;
     position: fixed;
+    z-index: 123124124;
 }
 .header .show,
 .header .disappear {
@@ -91,7 +91,7 @@ a {
 .header .div:first-child {
     position: relative;
 }
-.header .blur {
+/* .header .blur {
     position: absolute;
     top: 0;
     left: 0;
@@ -100,7 +100,7 @@ a {
     background-color: rgba(0, 0, 0, 0.5);
     filter: blur(10px);
     z-index: -1;
-}
+} */
 .header .container {
     display: flex;
     justify-content: space-between;
@@ -110,6 +110,11 @@ a {
 .header .container i{
     font-size: 25px;
     color: white;
+    display: none;
+}
+.header.dark .container i{
+    font-size: 25px;
+    color: #3e3e3e;
     display: none;
 }
 .header .container .toggle {
@@ -126,7 +131,7 @@ a {
     color: white;
     display: flex;
     align-items: center;
-    padding: 15px 0;
+    padding: 10px 0;
     font-size: 20px;
 }
 @media (max-width: 767px) {
@@ -154,6 +159,8 @@ a {
     align-items: center;
     position: relative;
     cursor: pointer;
+    font-size: 17px;
+    font-family: sans-serif;
 }
 .header .container .nav ul li::before{
     content: '';
@@ -195,16 +202,18 @@ a {
 .header .menu ul a.sign,
 .header .container .nav a.sign {
     align-items: center;
-    background-image: linear-gradient(144deg, #7640ff, var(--main-color) 50%, #0052eb);
+    background-image: linear-gradient(144deg, var(--secondary-color), rgb(21, 92, 184) 50%, var(--secondary-color));
     border: 0;
     border-radius: 8px;
     box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
     box-sizing: border-box;
     color: #FFFFFF;
     display: flex;
-    font-family: Phantomsans, sans-serif;
+    /* font-family: Phantomsans, sans-serif; */
     font-size: 18px;
     justify-content: center;
+    font-family: sans-serif;
+    font-weight: bold;
     line-height: 1em;
     max-width: 100%;
     min-width: 100px;
@@ -288,10 +297,11 @@ a {
 /* start landing */
 .landing {
     height: 100vh;
-    background-image: url('/img/v1016-b-09.jpg');
+    background-image: url('/img/rocket-space-concept-success-ai-generated.jpg');
     background-size: cover;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 }
 .landing::before {
     content: '';
@@ -300,12 +310,33 @@ a {
     left :0; 
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.3);
     z-index: 2;
 }
+.landing .clouds {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    background-repeat: repeat-y;
+    height: 120px;
+}
+.landing .clouds.one {
+    background-image: url('/img/clouds2.png');
+}
+.landing .clouds.two {
+    background-image: url('/img/clouds1.png');
+    bottom: 10px;
+}
+.landing .clouds.three{
+    background-image: url('/img/clouds3.png');
+    bottom: 30px;
+}
+
 .landing .container {
     display: flex;
-    justify-content: space-around;
+    justify-content: left;
     align-items: center;
     height: 100%;
     color: white;
@@ -314,7 +345,7 @@ a {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    width: 35%;
+    width: 50%;
     z-index: 30;
 }
 .landing .info .title {
@@ -421,3 +452,231 @@ a {
     }
 }
 /* end landing */
+
+
+/* HTML: <div class="loader"></div> */
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #141319;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1202352120;
+    display: none;
+}
+.loading-screen.active {
+    display: flex;
+}
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+}
+
+.loader::before,
+.loader::after {
+    content: "";
+    grid-area: 1/1;
+    --c: no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
+    background:
+        var(--c) 50% 0,
+        var(--c) 50% 100%,
+        var(--c) 100% 50%,
+        var(--c) 0 50%;
+    background-size: 12px 12px;
+    animation: l12 1s infinite;
+}
+
+.loader::before {
+    margin: 4px;
+    filter: hue-rotate(45deg);
+    background-size: 8px 8px;
+    animation-timing-function: linear
+}
+
+@keyframes l12 {
+    100% {
+        transform: rotate(.5turn)
+    }
+}
+
+/* Start about page */
+.container .row {
+    margin-top: 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 50px;
+    font-family: "Work sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
+        sans-serif;
+    padding-bottom: 100px;
+}
+.about .container .row img {
+    grid-area: 1/1;
+    width: 500px;
+    border-radius:10px 10px 0 0 ;
+    box-shadow: 0px -3px 20px 0px rgb(52 52 52);
+}
+.about .container .row .info .title {
+    letter-spacing: .15em;
+    color: #BEC8CE;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+.about .container .row .info .hent {
+    letter-spacing: -.02em;
+    font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-weight: 500;
+        line-height: 1.2;
+        color: #2D3238;
+        margin-bottom: 30px;
+    font-size: 28px;
+}
+.about .container .row .info .text {
+    letter-spacing: -.02em;
+    font-weight: 300;
+    color: #6C6F73;
+    margin: 0 0 10.5px;
+    margin-bottom: 50px !important;
+    font-size: 15px;
+    line-height: 1.4;
+}
+.about .container .row .info .getStarted {
+    padding: 10px;
+    color: white; 
+    background-color: #2595FF;
+    border-radius: 6px;
+    font-size: 14;
+    font-weight: 500;
+    width: 50px;height: 50px;
+}
+.about .container .getStarted:hover {
+    background-color: #1c83e3;
+}
+/* End about page */
+
+.stats {
+    height: 100px;
+    background-color: #084f8e;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: 1.9;  
+    font-size: 20;
+    line-height: 1.4;
+    box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+    margin-top: 15px;
+
+}
+.stats.two {
+    margin-top: -131px;
+}
+
+.stats2 {
+    background-color: #f4f5f6;
+}
+.stats2 .row {
+    padding-top: 100px;
+    margin-top: 0;
+}
+.stats2 .row h3 {
+    margin-top: 21px;
+    margin-bottom: 10.5px;
+    font-size: 28px;
+    font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #2D3238;
+}
+.stats2 .row p {
+    margin: 0 0 10.5px;
+    font-weight: 300;
+    letter-spacing: -.02em;
+    font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #6c6f73
+}
+.about .row .info {
+    position: relative;
+    margin-top: 50px;
+}
+.about .row .indicator {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 600px;
+    height: 1px;
+    background-color: black;
+    z-index: 4;
+}
+.about .row .indicator::after {
+    content: '';
+    background-color: white;
+    position: absolute;
+    right: -160px;
+    top: 75px;
+    height: 1px;
+    width: 200px;
+    transform: translateX(55px);
+    /* transform: translateY(100px); */
+    transform: rotate(50deg);
+}
+.about .row .info .card {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+} 
+.about .row .info .card  .text {
+    margin-top: 40px
+}
+.about .row .info .card img.img2 {
+    box-shadow: none;
+    border-radius: 0;
+    width: 70px;
+    height: 70px;
+
+}
+
+#footer {
+    display: flex;
+    flex-direction: row;
+    padding: 150px;
+    gap: 200px;
+    justify-content: center;  
+    font-family: "Work sans",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
+        sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.7);
+    background-color: #262f36;
+    font-weight: 100;
+}
+#footer .col h5{
+    letter-spacing: 2px;
+    line-height: 1.8;
+    color: white;
+    text-transform: uppercase;
+}
+#footer .col{
+    width: 40%;
+}
+.col p {
+    margin: 15px;
+}
+.col p span {
+    color: white;
+}
