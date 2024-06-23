@@ -15,6 +15,21 @@
         <!-- start header -->
         <div class="header" id="header"></div>
         <!-- end header -->
+        <!-- Start Lessons Levels Screen -->
+        <div class="lesson-levels">
+            <div class="container">
+                <div class="lang-toggle">
+                    <label for="ar-lang">عربي</label>
+                    <input type="radio" class="lang" name="lang" id="ar-lang" value="ar" onclick="{getLessons()}">
+                    <label for="en-lang">English</label>
+                    <input type="radio" class="lang" name="lang" id="en-lang" value="en" checked onclick="{getLessons()}">
+                </div>
+                <div class="cards-list">
+                    
+                </div>
+            </div>
+        </div>
+        <!-- End Lessons Levels Screen -->
         <!-- start typing-field -->
         <div id="video-lesson-content">
             <video class="video" src="" controls></video>
@@ -51,8 +66,8 @@
                     </div>
                     <p class="final-word"></p>
                     <div class="buttons">
-                        <button class="prev" onclick="{previousLesson()}" class="prev"><i class="fa-solid fa-arrow-left"></i>Previous</button>
-                        <button onclick="{restartLesson()}" class="restart">Restart <i class="fa-solid fa-rotate-left"></i></button>
+                        <button class="prev" onclick="{backToLessonsList()}" class="prev"><i class="fa-solid fa-arrow-left"></i>Back</button>
+                        <button onclick="{restartLesson()}" class="restart">Try Again <i class="fa-solid fa-rotate-left"></i></button>
                         <button class="next" onclick="{nextLesson()}" class="next">Next<i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                 </div>
@@ -70,9 +85,13 @@
                     </div>
                     <div class="control-bar">
                         <p class="lesson-name"></p>
-                        <button class="play baused" onclick="{playBause()}"></button>
+                        <div class="btns">
+                            <button class="return" onclick="{backToLessonsList()}"></button>
+                            <button class="restart" onclick="{restartLesson()}"></button>
+                            <button class="play baused" onclick="{playBause();}"></button>
+                        </div>
                     </div>
-                    <div class="keyboard theme-robot">
+                    <div class="keyboard theme-robot" style="height: 261px;">
                         <div class="keyboard-plugin" style="width: 100%;">
                             <div class="" tabindex="-1" aria-hidden="true"
                                 style="opacity: 1; width: 685px; position: relative; margin-top: 55px;">
@@ -438,8 +457,8 @@
                                             </path>
                                         </g>
                                         <g id="letters">
-                                            <text transform="matrix(1 0 0 1 33.4903 33.804)" class="edc-st1 ~ edc-st2" dx="0" dy="0">~</text>
-                                            <text transform="matrix(1 0 0 1 35.8009 52.6643)" class="edc-st1 ' edc-st2" dx="0" dy="0">`</text>
+                                            <text transform="matrix(1 0 0 1 33.4903 33.804)" class="edc-st1 ~ followed edc-st2" dx="0" dy="0">~</text>
+                                            <text transform="matrix(1 0 0 1 35.8009 52.6643)" class="edc-st1 ` edc-st2 bld" dx="0" dy="0">`</text>
                                             <text transform="matrix(1 0 0 1 78.626 50.4071)" class="edc-st1 1 edc-st2" dx="0" dy="0">1</text>
                                             <text transform="matrix(1 0 0 1 123.299 51.1765)" class="edc-st1 2 edc-st2" dx="0" dy="0">2</text>
                                             <text transform="matrix(1 0 0 1 169.6841 51.404)" class="edc-st1 3 edc-st2" dx="0" dy="0">3</text>
@@ -452,116 +471,116 @@
                                             <text transform="matrix(1 0 0 1 483.4907 51.2157)" class="edc-st1 0 edc-st2" dx="0" dy="0">0</text>
                                             <text transform="matrix(1 0 0 1 530.4011 50.4071)" class="edc-st1 - edc-st2" dx="0" dy="0">-</text>
                                             <text transform="matrix(1 0 0 1 573.5195 51.2157)" class="edc-st1 = edc-st2" dx="0" dy="0">=</text>
-                                            <text transform="matrix(1 0 0 1 80.5513 31.7605)" class="edc-st1 1 edc-st2" dx="0" dy="0">!</text>
-                                            <text transform="matrix(1 0 0 1 119.8565 30.45)" class="edc-st1 2 edc-st2" dx="0" dy="0">@</text>
-                                            <text transform="matrix(1 0 0 1 169.6841 31.76)" class="edc-st1 3 edc-st2" dx="0" dy="0">#</text>
-                                            <text transform="matrix(1 0 0 1 213.0758 31.2171)" class="edc-st1 4 edc-st2" dx="0" dy="0">$</text>
-                                            <text transform="matrix(1 0 0 1 255.5748 30.8318)" class="edc-st1 5 edc-st2" dx="0" dy="0">%</text>
-                                            <text transform="matrix(1 0 0 1 303.9556 32.4427)" class="edc-st1 6 edc-st2" dx="0" dy="0">^</text>
-                                            <text transform="matrix(1 0 0 1 348.2554 31.76)" class="edc-st1 7 edc-st2" dx="0" dy="0">&amp;</text>
-                                            <text transform="matrix(1 0 0 1 394.5334 32.8236)" class="edc-st1 8 edc-st2" dx="0" dy="0">*</text>
-                                            <text transform="matrix(1 0 0 1 440.3076 30.6435)" class="edc-st1 9 edc-st2" dx="0" dy="0">(</text>
-                                            <text transform="matrix(1 0 0 1 485.1645 30.6435)" class="edc-st1 0 edc-st2" dx="0" dy="0">)</text>
-                                            <text transform="matrix(1 0 0 1 528.7588 25.5423)" class="edc-st1 - edc-st2" dx="0" dy="0">_</text>
-                                            <text transform="matrix(1 0 0 1 573.5195 32.4422)" class="edc-st1 = edc-st2" dx="0" dy="0">+</text>
+                                            <text transform="matrix(1 0 0 1 80.5513 31.7605)" class="edc-st1 1 edc-st2 followed" dx="0" dy="0">!</text>
+                                            <text transform="matrix(1 0 0 1 119.8565 30.45)" class="edc-st1 2 edc-st2 followed" dx="0" dy="0">@</text>
+                                            <text transform="matrix(1 0 0 1 169.6841 31.76)" class="edc-st1 3 edc-st2 followed" dx="0" dy="0">#</text>
+                                            <text transform="matrix(1 0 0 1 213.0758 31.2171)" class="edc-st1 4 edc-st2 followed" dx="0" dy="0">$</text>
+                                            <text transform="matrix(1 0 0 1 255.5748 30.8318)" class="edc-st1 5 edc-st2 followed" dx="0" dy="0">%</text>
+                                            <text transform="matrix(1 0 0 1 303.9556 32.4427)" class="edc-st1 6 edc-st2 followed" dx="0" dy="0">^</text>
+                                            <text transform="matrix(1 0 0 1 348.2554 31.76)" class="edc-st1 7 edc-st2 followed" dx="0" dy="0">&amp;</text>
+                                            <text transform="matrix(1 0 0 1 394.5334 32.8236)" class="edc-st1 8 edc-st2 followed" dx="0" dy="0">*</text>
+                                            <text transform="matrix(1 0 0 1 440.3076 30.6435)" class="edc-st1 9 edc-st2 followed" dx="0" dy="0">(</text>
+                                            <text transform="matrix(1 0 0 1 485.1645 30.6435)" class="edc-st1 0 edc-st2 followed" dx="0" dy="0">)</text>
+                                            <text transform="matrix(1 0 0 1 528.7588 25.5423)" class="edc-st1 - edc-st2 followed" dx="0" dy="0">_</text>
+                                            <text transform="matrix(1 0 0 1 573.5195 32.4422)" class="edc-st1 = edc-st2 followed" dx="0" dy="0">+</text>
                                             <text transform="matrix(1 0 0 1 100.9088 75.4743)" class="edc-st1" dx="0" dy="0">Q</text>
                                             <text transform="matrix(1 0 0 1 100.9088 93.4743)" class="edc-st1 q edc-st2 bld" dx="-4.956243991851807"
-                                                dy="-5">Q</text>
+                                                dy="-5">q</text>
                                             <text transform="matrix(1 0 0 1 145.3644 75.4744)" class="edc-st1" dx="0" dy="0">W</text>
                                             <text transform="matrix(1 0 0 1 145.3644 93.4744)" class="edc-st1 w edc-st2 bld" dx="-5.800000190734863"
-                                                dy="-5">W</text>
+                                                dy="-5">w</text>
                                             <text transform="matrix(1 0 0 1 190.5943 75.4744)" class="edc-st1" dx="0" dy="0">E</text>
                                             <text transform="matrix(1 0 0 1 190.5943 93.4744)" class="edc-st1 e edc-st2 bld"
-                                                dx="-3.2937378883361816" dy="-5">E</text>
+                                                dx="-3.2937378883361816" dy="-5">e</text>
                                             <text transform="matrix(1 0 0 1 236.9933 75.4743)" class="edc-st1" dx="0" dy="0">R</text>
                                             <text transform="matrix(1 0 0 1 236.9933 93.4743)" class="edc-st1 r edc-st2 bld" dx="-5.800000429153442"
-                                                dy="-5">R</text>
+                                                dy="-5">r</text>
                                             <text transform="matrix(1 0 0 1 280.6080 75.4744)" class="edc-st1" dx="0" dy="0">T</text>
                                             <text transform="matrix(1 0 0 1 280.6080 93.4744)" class="edc-st1 t edc-st2 bld"
-                                                dx="-4.6000120639801025" dy="-5">T</text>
+                                                dx="-4.6000120639801025" dy="-5">t</text>
                                             <text transform="matrix(1 0 0 1 326.5138 75.4744)" class="edc-st1" dx="0" dy="0">Y</text>
                                             <text transform="matrix(1 0 0 1 326.5138 93.4744)" class="edc-st1 y edc-st2 bld" dx="-4.5999755859375"
-                                                dy="-5">Y</text>
+                                                dy="-5">y</text>
                                             <text transform="matrix(1 0 0 1 371.1386 75.4743)" class="edc-st1" dx="0" dy="0">U</text>
                                             <text transform="matrix(1 0 0 1 371.1386 93.4743)" class="edc-st1 u edc-st2 bld" dx="-4.231274127960205"
-                                                dy="-5">U</text>
+                                                dy="-5">u</text>
                                             <text transform="matrix(1 0 0 1 418.5557 75.4743)" class="edc-st1" dx="0" dy="0">I</text>
                                             <text transform="matrix(1 0 0 1 418.5557 93.4743)" class="edc-st1 i edc-st2 bld"
-                                                dx="-0.9500001668930054" dy="-5">I</text>
+                                                dx="-0.9500001668930054" dy="-5">i</text>
                                             <text transform="matrix(1 0 0 1 459.9639 75.4743)" class="edc-st1" dx="0" dy="0">O</text>
                                             <text transform="matrix(1 0 0 1 459.9639 93.4743)" class="edc-st1 o edc-st2 bld" dx="-4.737499713897705"
-                                                dy="-5">O</text>
+                                                dy="-5">o</text>
                                             <text transform="matrix(1 0 0 1 506.9335 75.4743)" class="edc-st1 " dx="0" dy="0">P</text>
                                             <text transform="matrix(1 0 0 1 506.9335 93.4743)" class="edc-st1 p edc-st2 bld "
-                                                dx="-3.2937259674072266" dy="-5">P</text>
+                                                dx="-3.2937259674072266" dy="-5">p</text>
                                             <text transform="matrix(1 0 0 1 112.1346 120.3303)" class="edc-st1" dx="0" dy="0">A</text>
                                             <text transform="matrix(1 0 0 1 112.1346 138.3303)" class="edc-st1 a edc-st2 bld"
-                                                dx="-4.200000286102295" dy="-5">A</text>
+                                                dx="-4.200000286102295" dy="-5">a</text>
                                             <text transform="matrix(1 0 0 1 156.0135 120.3303)" class="edc-st1" dx="0" dy="0">S</text>
                                             <text transform="matrix(1 0 0 1 156.0135 138.3303)" class="edc-st1 s edc-st2 bld"
-                                                dx="-3.6937503814697266" dy="-5">S</text>
+                                                dx="-3.6937503814697266" dy="-5">s</text>
                                             <text transform="matrix(1 0 0 1 201.5241 120.3303)" class="edc-st1" dx="0" dy="0">D</text>
                                             <text transform="matrix(1 0 0 1 201.5241 138.3303)" class="edc-st1 d edc-st2 bld"
-                                                dx="-4.231237888336182" dy="-5">D</text>
+                                                dx="-4.231237888336182" dy="-5">d</text>
                                             <text transform="matrix(1 0 0 1 247.1121 120.3303)" class="edc-st1" dx="0" dy="0">F</text>
                                             <text transform="matrix(1 0 0 1 247.1121 138.3303)" class="edc-st1 f edc-st2 bld"
-                                                dx="-3.762500047683716" dy="-5">F</text>
+                                                dx="-3.762500047683716" dy="-5">f</text>
                                             <text transform="matrix(1 0 0 1 289.4753 120.3303)" class="edc-st1" dx="0" dy="0">G</text>
                                             <text transform="matrix(1 0 0 1 289.4753 138.3303)" class="edc-st1 g edc-st2 bld"
-                                                dx="-4.956237316131592" dy="-5">G</text>
+                                                dx="-4.956237316131592" dy="-5">g</text>
                                             <text transform="matrix(1 0 0 1 335.5886 120.3303)" class="edc-st1" dx="0" dy="0">H</text>
                                             <text transform="matrix(1 0 0 1 335.5886 138.3303)" class="edc-st1 h edc-st2 bld"
-                                                dx="-4.231274127960205" dy="-5">H</text>
+                                                dx="-4.231274127960205" dy="-5">h</text>
                                             <text transform="matrix(1 0 0 1 382.2692 120.3303)" class="edc-st1" dx="0" dy="0">J</text>
                                             <text transform="matrix(1 0 0 1 382.2692 138.3303)" class="edc-st1 j edc-st2 bld"
-                                                dx="-3.0437986850738525" dy="-5">J</text>
+                                                dx="-3.0437986850738525" dy="-5">j</text>
                                             <text transform="matrix(1 0 0 1 426.0182 120.3303)" class="edc-st1" dx="0" dy="0">K</text>
                                             <text transform="matrix(1 0 0 1 426.0182 138.3303)" class="edc-st1 k edc-st2 bld"
-                                                dx="-4.199975490570068" dy="-5">K</text>
+                                                dx="-4.199975490570068" dy="-5">k</text>
                                             <text transform="matrix(1 0 0 1 470.8706 120.3303)" class="edc-st1" dx="0" dy="0">L</text>
                                             <text transform="matrix(1 0 0 1 470.8706 138.3303)" class="edc-st1 l edc-st2 bld"
-                                                dx="-4.574999928474426" dy="-5">L</text>
+                                                dx="-4.574999928474426" dy="-5">l</text>
                                             <text transform="matrix(1 0 0 1 134.7896 163.7458)" class="edc-st1" dx="0" dy="0">Z</text>
                                             <text transform="matrix(1 0 0 1 134.7896 181.7458)" class="edc-st1 z edc-st2 bld" dx="-3"
-                                                dy="-5">Z</text>
+                                                dy="-5">z</text>
                                             <text transform="matrix(1 0 0 1 179.2339 163.7458)" class="edc-st1" dx="0" dy="0">X</text>
                                             <text transform="matrix(1 0 0 1 179.2339 181.7458)" class="edc-st1 x edc-st2 bld"
-                                                dx="-4.200000286102295" dy="-5">X</text>
+                                                dx="-4.200000286102295" dy="-5">x</text>
                                             <text transform="matrix(1 0 0 1 222.5416 163.7458)" class="edc-st1" dx="0" dy="0">C</text>
                                             <text transform="matrix(1 0 0 1 222.5416 181.7458)" class="edc-st1 c edc-st2 bld"
-                                                dx="-4.412500381469727" dy="-5">C</text>
+                                                dx="-4.412500381469727" dy="-5">c</text>
                                             <text transform="matrix(1 0 0 1 269.3973 163.7458)" class="edc-st1" dx="0" dy="0">V</text>
                                             <text transform="matrix(1 0 0 1 269.3973 181.7458)" class="edc-st1 v edc-st2 bld"
-                                                dx="-4.200000286102295" dy="-5">V</text>
+                                                dx="-4.200000286102295" dy="-5">v</text>
                                             <text transform="matrix(1 0 0 1 314.0098 163.7458)" class="edc-st1" dx="0" dy="0">B</text>
                                             <text transform="matrix(1 0 0 1 314.0098 181.7458)" class="edc-st1 b edc-st2 bld"
-                                                dx="-3.293750286102295" dy="-5">B</text>
+                                                dx="-3.293750286102295" dy="-5">b</text>
                                             <text transform="matrix(1 0 0 1 358.4863 163.7458)" class="edc-st1" dx="0" dy="0">N</text>
                                             <text transform="matrix(1 0 0 1 358.4863 181.7458)" class="edc-st1 n edc-st2 bld"
-                                                dx="-4.231250286102295" dy="-5">N</text>
+                                                dx="-4.231250286102295" dy="-5">n</text>
                                             <text transform="matrix(1 0 0 1 401.6816 163.7458)" class="edc-st1" dx="0" dy="0">M</text>
                                             <text transform="matrix(1 0 0 1 401.6816 181.7458)" class="edc-st1 m edc-st2 bld"
-                                                dx="-3.5937252044677734" dy="-5">M</text>
-                                            <text transform="matrix(1 0 0 1 519.074 136.7127)" class="edc-st1 ; edc-st2" dx="0" dy="0">;</text>
-                                            <text transform="matrix(1 0 0 1 519.074 119.3763)" class="edc-st1 ; edc-st2" dx="0" dy="0">:</text>
+                                                dx="-3.5937252044677734" dy="-5">m</text>
+                                            <text transform="matrix(1 0 0 1 519.074 136.7127)" class="edc-st1 ; edc-st2 bld" dx="0" dy="0">;</text>
+                                            <text transform="matrix(1 0 0 1 519.074 119.3763)" class="edc-st1 ; edc-st2 followed" dx="0" dy="0">:</text>
                                             <text transform="matrix(1 0 0 1 451.3285 180.0409)"
-                                                class="${layoutClassPrefix}st1 ${layoutClassPrefix}st2 edc-st1 edc-st2 , bld2" dx="-1.25" dy="0">,</text>
-                                            <text transform="matrix(1 0 0 1 450.2827 164.3396)" class="edc-st1 , edc-st2" dx="0"
+                                                class="${layoutClassPrefix}st1 ${layoutClassPrefix}st2 edc-st1 edc-st2 , bld" dx="-1.25" dy="0">,</text>
+                                            <text transform="matrix(1 0 0 1 450.2827 164.3396)" class="edc-st1 , edc-st2 followed" dx="0"
                                                 dy="0">&lt;</text>
                                             <text transform="matrix(1 0 0 1 495.9731 181.0409)"
-                                                class="${layoutClassPrefix}st1 ${layoutClassPrefix}st2 edc-st1 edc-st2 . bld2" dx="-1.25" dy="0">.</text>
-                                            <text transform="matrix(1 0 0 1 494.9274 164.3396)" class="edc-st1 . edc-st2" dx="0"
+                                                class="${layoutClassPrefix}st1 ${layoutClassPrefix}st2 edc-st1 edc-st2 . bld" dx="-1.25" dy="0">.</text>
+                                            <text transform="matrix(1 0 0 1 494.9274 164.3396)" class="edc-st1 . edc-st2 followed" dx="0"
                                                 dy="0">&gt;</text>
-                                            <text transform="matrix(1 0 0 1 543.4077 181.0408)" class="edc-st1 / edc-st2" dx="0" dy="0">/</text>
-                                            <text transform="matrix(1 0 0 1 541.3276 163.2498)" class="edc-st1 / edc-st2" dx="0" dy="0">?</text>
-                                            <text transform="matrix(1 0 0 1 565.621 138.7127)" class="edc-st1 ' edc-st2" dx="0" dy="0">'</text>
-                                            <text transform="matrix(1 0 0 1 565.621 120.3763)" class="edc-st1 ' edc-st2" dx="0" dy="0">"</text>
-                                            <text transform="matrix(1 0 0 1 553.3923 94.426)" class="edc-st1 { edc-st2" dx="0" dy="0">[</text>
-                                            <text transform="matrix(1 0 0 1 552.9709 74.8769)" class="edc-st1 { edc-st2" dx="0" dy="0">{</text>
-                                            <text transform="matrix(1 0 0 1 598.7657 94.426)" class="edc-st1 } edc-st2" dx="0" dy="0">]</text>
-                                            <text transform="matrix(1 0 0 1 598.3443 74.7849)" class="edc-st1 } edc-st2" dx="0" dy="0">}</text>
+                                            <text transform="matrix(1 0 0 1 543.4077 181.0408)" class="edc-st1 / edc-st2 bld" dx="0" dy="0">/</text>
+                                            <text transform="matrix(1 0 0 1 541.3276 163.2498)" class="edc-st1 / edc-st2 followed" dx="0" dy="0">?</text>
+                                            <text transform="matrix(1 0 0 1 565.621 138.7127)" class="edc-st1 ' edc-st2 bld" dx="0" dy="0">'</text>
+                                            <text transform="matrix(1 0 0 1 565.621 120.3763)" class="edc-st1 ' edc-st2 followed" dx="0" dy="0">"</text>
+                                            <text transform="matrix(1 0 0 1 553.3923 94.426)" class="edc-st1 { edc-st2 bld" dx="0" dy="0">[</text>
+                                            <text transform="matrix(1 0 0 1 552.9709 74.8769)" class="edc-st1 { edc-st2 followed" dx="0" dy="0">{</text>
+                                            <text transform="matrix(1 0 0 1 598.7657 94.426)" class="edc-st1 } edc-st2 bld" dx="0" dy="0">]</text>
+                                            <text transform="matrix(1 0 0 1 598.3443 74.7849)" class="edc-st1 } edc-st2 followed" dx="0" dy="0">}</text>
                                             <text transform="matrix(1 0 0 1 644.3574 96.8807)" class="edc-st1 \ edc-st2" dx="0" dy="0">\</text>
-                                            <text transform="matrix(1 0 0 1 644.4941 74.8769)" class="edc-st1 \ edc-st2" dx="0" dy="0">|</text>
+                                            <text transform="matrix(1 0 0 1 644.4941 74.8769)" class="edc-st1 \ edc-st2 followed" dx="0" dy="0">|</text>
                                             <text id="text-tab" transform="matrix(1 0 0 1 23.3467 93.2342)" class="edc-st1 tab special edc-st2">tab</text>
                                             <text id="text-caps-lock" transform="matrix(1 0 0 1 23.3467 137.7127)"
                                                 class="edc-st1 special capslock edc-st2">caps lock</text>

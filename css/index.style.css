@@ -24,10 +24,12 @@
 
 html {
     scroll-behavior: smooth;
+    scrollbar-width: none;
 }
 
 body {
     font-family: "Droid Sans Mono";
+    /* scrollbar-width: none; */
 }
 
 ul {
@@ -463,7 +465,7 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1202352120;
+    z-index: 12023522395789120;
     display: none;
 }
 .loading-screen.active {

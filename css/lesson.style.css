@@ -613,6 +613,11 @@ object {
     width: 100%;
     font-family: "Droid Sans Mono";
 }
+.control-bar .btns {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
 .control-bar .play{
     font: var(--fa-font-solid);
     font-size: 27px;
@@ -621,11 +626,35 @@ object {
     color: #707e93;
     text-shadow: 2px 2px 12px #000000a6;
 }
-.control-bar .play.played::before{
+.control-bar .btns .play.played::before{
     content: '\f04c';
 }
-.control-bar .play.baused::before{
+.control-bar .btns .play.baused::before{
     content: '\f04b';
+}
+.control-bar .restart {
+    font: var(--fa-font-solid);
+    font-size: 27px;
+    border: none;
+    background: transparent;
+    color: #707e93;
+    text-shadow: 2px 2px 12px #000000a6;
+}
+
+.control-bar .restart::before{
+    content: '\f0e2';
+}
+.control-bar .return {
+    font: var(--fa-font-solid);
+    font-size: 27px;
+    border: none;
+    background: transparent;
+    color: #707e93;
+    text-shadow: 2px 2px 12px #000000a6;
+}
+
+.control-bar .return::before{
+    content: '\f060';
 }
 .control-bar p{
     color: #707e93;
@@ -702,4 +731,163 @@ object {
 .choose-test-level p {
     text-align: center;
     color: #a9a9a9
+}
+
+.lesson-levels.hide{
+    display: none;
+}
+.lesson-levels{
+    display: flex;
+    z-index: 10231;
+    background: #141319 url('/img/robot.png');
+    background-position: right bottom;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    height: 100vh;
+    align-items: center;
+    user-select: none;
+}
+.lesson-levels .container {
+    /* background-color: orange; */
+    position: relative;
+    overflow: hidden;
+    height: 83%;
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+}
+.lesson-levels .container .lang-toggle{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    right: 20px;
+    top: 10px;
+    color: #e3e3e3;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.lesson-levels .container .lang-toggle input[type='radio']{
+    height: 20px;
+    width: 20px;
+    stroke-width: 0;
+}
+
+.lesson-levels .container .cards-list{
+    margin-top: 50px;
+    display: flex;
+    padding: 15px;
+    flex-direction: row;
+    flex-wrap: wrap !important;
+    justify-content: center;
+    overflow-y:scroll !important;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.lesson-levels .container .cards-list .lesson-card {
+    background: white url('/img/Typing-bro (1).png');
+    background-position: top;
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 250px;
+    width: 180px;
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 30px;
+    margin: 10px 20px;
+    padding: 0 8px;
+}
+.lesson-levels .container .cards-list .lesson-card.video{
+    background-image: url('/img/25481.jpg');
+    background-size: contain;
+    background-position-y: 25px;
+}
+.lesson-levels .container .cards-list .lesson-card::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color:rgba(0, 0, 0, 0.13241);
+    z-index: 1;
+}
+.lesson-levels .container .cards-list .lesson-card.not-accessed::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color:rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.lesson-levels .container .cards-list .lesson-card .stars {
+    font-size: 40px;
+    margin: 5px 0 30px 0;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 80px;
+    z-index: 3;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i{
+    color: rgb(245, 245, 222);
+    font-size: 40px;
+    text-shadow: 0px 0px 3px black;
+}
+.lesson-levels .container .cards-list .lesson-card.not-accessed .stars i{
+    color: rgb(169, 169, 165);
+    font-size: 40px;
+    text-shadow: 0px 0px 3px black;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i.active{
+    color: yellow !important;
+    font-size: 40px;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i:first-child{
+    font-size: 27px;
+    margin-top: 45px;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i:nth-child(2){
+    font-size: 40px;
+    margin-top: 20px;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i:nth-child(3){
+    font-size: 50px;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i:nth-child(4){
+    font-size: 40px;
+    margin-top: 20px;
+}
+.lesson-levels .container .cards-list .lesson-card .stars i:last-child{
+    font-size: 27px;
+    margin-top: 45px;
+}
+.lesson-levels .container .cards-list .lesson-card .text{
+    z-index: 3;
+    text-align: center;
+    font-size: 18px;
+    font-family: "Droid Sans Mono" !important; 
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px;
+    gap: 10px;
+    width: 100%;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.584);
+    /* text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.7); */
+}
+.lesson-levels .container .cards-list .lesson-card .text .title{
+    font-weight: bold;
+}
+.lesson-levels .container .cards-list .lesson-card .text .requiered{
+    font-size: 14px;
+    font-weight: bold;
+    color: #292929;
 }
