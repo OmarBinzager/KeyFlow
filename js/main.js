@@ -1,5 +1,5 @@
 let header = document.createElement('div');
-function createHeader() {
+function createHeader(home, lessons, game, test) {
     header.innerHTML = `
         <div class="blur"></div>
         <div class="container">
@@ -8,10 +8,10 @@ function createHeader() {
             </div>
             <div class="nav">
                 <ul>
-                    <li><a href="../../index.html">Home</a></li>
-                    <li><a href="/pages/lesson.html">Lessons</a></li>
-                    <li><a href="../pages/ZType/index.html">Game</a></li>
-                    <li><a href="/pages/TypingTest.html">Typing Test</a></li>
+                    <li><a href="${home}index.html">Home</a></li>
+                    <li><a href="${lessons}lesson.html">Lessons</a></li>
+                    <li><a href="${game}index.html">Game</a></li>
+                    <li><a href="${test}TypingTest.html">Typing Test</a></li>
                 </ul>
                 <div class="toggle">
                     <i class="fas fa-bars toggle-menu"></i>
@@ -20,31 +20,30 @@ function createHeader() {
         </div>
         <div class="menu">
             <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="/pages/lesson.html">Lessons</a></li>
-                <li><a href="../pages/ZType/index.html">Game</a></li>
-                <li><a href="/pages/TypingTest.html">Typing Test</a></li>
+                <li><a href="${home}index.html">Home</a></li>
+                <li><a href="${lessons}lesson.html">Lessons</a></li>
+                <li><a href="${game}index.html">Game</a></li>
+                <li><a href="${test}TypingTest.html">Typing Test</a></li>
             </ul>
         </div>
     `;
     document.getElementById('header').appendChild(header);
 }
 
-createHeader();
 
-let menu = document.querySelector('.header .menu');
+menuButton = document.querySelector('#header .nav .toggle-menu');
 // toggle.addEventListener(('mouseDown', () => {
 //     console.log('toggle clicked');
 //     menu.style.height = '100%';
 // }))
-
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('toggle-menu')) {
-        menu.classList.toggle('active');
+        document.querySelector('.header .menu').classList.toggle('active');
     } else {
-        menu.classList.remove('active');
+        document.querySelector('.header .menu').classList.remove('active');
     }
 });
+
 
 document.addEventListener('scroll', () => {
     if (window.scrollY >= '100') {

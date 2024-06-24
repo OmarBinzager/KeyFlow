@@ -53,7 +53,7 @@ a {
 /* Small */
 @media (min-width: 768px) {
     .container {
-        width: 750px;
+        width: 100%;
     }
 }
 
@@ -194,6 +194,7 @@ a {
     width: 100%;
     height: 0;
     overflow: hidden;
+    background-color: #36334ea0;
 }
 .header .menu.active{
     height: 100%;
@@ -299,8 +300,9 @@ a {
 /* start landing */
 .landing {
     height: 100vh;
-    background-image: url('/img/rocket-space-concept-success-ai-generated.jpg');
+    background-image: url('../img/rocket-space-concept-success-ai-generated.jpg');
     background-size: cover;
+    background-position: center top;
     position: relative;
     z-index: 1;
     overflow: hidden;
@@ -325,14 +327,14 @@ a {
     height: 120px;
 }
 .landing .clouds.one {
-    background-image: url('/img/clouds2.png');
+    background-image: url('../img/clouds2.png');
 }
 .landing .clouds.two {
-    background-image: url('/img/clouds1.png');
+    background-image: url('../img/clouds1.png');
     bottom: 10px;
 }
 .landing .clouds.three{
-    background-image: url('/img/clouds3.png');
+    background-image: url('../img/clouds3.png');
     bottom: 30px;
 }
 
@@ -523,6 +525,7 @@ a {
     border-radius:10px 10px 0 0 ;
     box-shadow: 0px -3px 20px 0px rgb(52 52 52);
 }
+
 .about .container .row .info .title {
     letter-spacing: .15em;
     color: #BEC8CE;
@@ -533,10 +536,10 @@ a {
 .about .container .row .info .hent {
     letter-spacing: -.02em;
     font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight: 500;
-        line-height: 1.2;
-        color: #2D3238;
-        margin-bottom: 30px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #2D3238;
+    margin-bottom: 30px;
     font-size: 28px;
 }
 .about .container .row .info .text {
@@ -548,6 +551,34 @@ a {
     font-size: 15px;
     line-height: 1.4;
 }
+@media (max-width: 767px) {
+    .about .container .row .info .text {
+        font-size: 12px;
+    }
+    .about .container .row .info .hent{
+        font-size: 22px;
+    }
+    .about .container .row .info .getStarted{
+        font-size: 12px;
+    }
+}
+@media (max-width: 991px) {
+    .about .container .info{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .about .container .row .img {
+            display: none;
+    }
+    .about .container .row{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
 .about .container .row .info .getStarted {
     padding: 10px;
     color: white; 
@@ -555,7 +586,6 @@ a {
     border-radius: 6px;
     font-size: 14;
     font-weight: 500;
-    width: 50px;height: 50px;
 }
 .about .container .getStarted:hover {
     background-color: #1c83e3;
@@ -569,6 +599,7 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
     font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 500;
     letter-spacing: 1.9;  
@@ -578,6 +609,11 @@ a {
     margin-top: 15px;
 
 }
+/* @media (max-width: 767px) {
+    .stats p{
+        font-size: 16px;
+    }
+} */
 .stats.two {
     margin-top: -131px;
 }
@@ -607,6 +643,7 @@ a {
     line-height: 1.4;
     color: #6c6f73
 }
+
 .about .row .info {
     position: relative;
     margin-top: 50px;
@@ -631,6 +668,11 @@ a {
     transform: translateX(55px);
     /* transform: translateY(100px); */
     transform: rotate(50deg);
+}
+@media (max-width: 991px) {
+    .about .row .indicator {
+        display: none;
+    }
 }
 .about .row .info .card {
     display: flex;
@@ -667,6 +709,15 @@ a {
     background-color: #262f36;
     font-weight: 100;
 }
+@media (max-width: 991px) {
+    #footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 50px;
+        padding: 15px;
+    }
+}
 #footer .col h5{
     letter-spacing: 2px;
     line-height: 1.8;
@@ -682,3 +733,31 @@ a {
 .col p span {
     color: white;
 }
+@media (max-width: 767px) {
+    .stats2 .row {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stats2 .row h3 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .stats2 .row p {
+        font-size: 12px;
+        text-align: center;
+    }
+}
+/* @media (min-width: 768px) {
+    .stats.two {
+        font-size: 12px;
+        text-align: center;
+    }
+    .stats {
+        font-size: 12px;
+        text-align: center;
+    }
+} */

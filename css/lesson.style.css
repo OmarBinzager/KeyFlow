@@ -11,7 +11,7 @@
 }
 
 body {
-    background: #141319 url('/img/robot.png');
+    background: #141319 url('../img/robot.png');
     background-position: right bottom;
     background-size: 100% auto;
     background-repeat: no-repeat;
@@ -590,6 +590,18 @@ object {
     width: 100%;
     height: 100%;
 }
+@media (max-width: 991px) {
+    video{
+        width: 700px;
+        height: 450px;
+    }
+}
+@media (max-width: 768px) {
+    video{
+        width: 350px;
+        height: 150px;
+    }
+}
 #video-lesson-content .skip-button{
     margin-top: 20px;
     padding: 5px 20px;
@@ -739,7 +751,7 @@ object {
 .lesson-levels{
     display: flex;
     z-index: 10231;
-    background: #141319 url('/img/robot.png');
+    background: #141319 url('../img/robot.png');
     background-position: right bottom;
     background-size: 100% auto;
     background-repeat: no-repeat;
@@ -788,7 +800,7 @@ object {
     scrollbar-width: none;
 }
 .lesson-levels .container .cards-list .lesson-card {
-    background: white url('/img/Typing-bro (1).png');
+    background: white url('../img/Typing-bro (1).png');
     background-position: top;
     background-size: contain;
     background-repeat: no-repeat;
@@ -805,7 +817,7 @@ object {
     padding: 0 8px;
 }
 .lesson-levels .container .cards-list .lesson-card.video{
-    background-image: url('/img/25481.jpg');
+    background-image: url('../img/25481.jpg');
     background-size: contain;
     background-position-y: 25px;
 }
