@@ -437,7 +437,7 @@ const typeSound = new AudioContext();
 
 function typeSoundStart() {
     // Load the sound file asynchronously
-    fetch('../sounds/typewriter.mp3')
+    fetch('sounds/typewriter.mp3')
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => typeSound.decodeAudioData(arrayBuffer))
         .then((audioBuffer) => {
@@ -451,7 +451,7 @@ const errorSound = new AudioContext();
 
 function errorSoundStart() {
     // Load the sound file asynchronously
-    fetch('../sounds/error.mp3')
+    fetch('sounds/error.mp3')
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => errorSound.decodeAudioData(arrayBuffer))
         .then((audioBuffer) => {
