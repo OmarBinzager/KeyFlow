@@ -213,6 +213,8 @@ function generateLessonCard(
     lessonsList.appendChild(lessonCard);
     if (!notAccessed) {
         lessonCard.onclick = function () {
+            lessonsLevelsScreen.classList.add('hide');
+            loadingScreen.classList.add('active');
             let lessonId = this.dataset.id;
             if (localStorage.isArabic == 'false') {
                 cur_lesson = lessonId;
@@ -225,11 +227,6 @@ function generateLessonCard(
 }
 // getLesson(lessonInfo, lessonId = undefined);
 function handleLesson(lessonData) {
-    lessonsLevelsScreen.classList.add('hide');
-    loadingScreen.classList.add('active');
-    setTimeout(() => {
-        loadingScreen.classList.remove('active');
-    }, 2 * 1000);
     lessonInfo.type = lessonData.type;
     lessonInfo.name = lessonData.name;
     lessonInfo.level = lessonData.level;
@@ -262,11 +259,8 @@ function handleLesson(lessonData) {
 }
 function backToLessonsList() {
     loadingScreen.classList.add('active');
-    setTimeout(() => {
-        loadingScreen.classList.remove('active');
-    }, 2 * 1000);
+    lessonsLevelsScreen.classList.add('hide');
     getLessons();
-    lessonsLevelsScreen.classList.remove('hide');
     typingLessonContent.style.display = 'none';
     holderIndexToken = 0;
     margintop = 0;
@@ -291,6 +285,8 @@ function backToLessonsList() {
     lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
     starsHolder.forEach((s) => s.classList.remove('filled'));
     increaseProgress();
+    lessonsLevelsScreen.classList.remove('hide');
+    loadingScreen.classList.remove('active');
 }
 function getLesson(id) {
     let myRequest = new XMLHttpRequest();
@@ -299,6 +295,7 @@ function getLesson(id) {
             let handleLessons = JSON.parse(this.responseText);
             handleLesson(handleLessons.lessons[id]);
             startLesson();
+            loadingScreen.classList.remove('active');
         }
     };
     if (localStorage.isArabic == undefined)
@@ -318,6 +315,8 @@ function getLesson(id) {
 }
 
 function getLessons() {
+    lessonsLevelsScreen.classList.add('hide');
+    loadingScreen.classList.add('active');
     let langRadio = document.querySelector(
         'input[type=radio].lang:checked'
     ).value;
@@ -335,6 +334,8 @@ function getLessons() {
             let handleLessons = JSON.parse(this.responseText);
             print(handleLesson);
             ListLessonsCards(handleLessons.lessons);
+            lessonsLevelsScreen.classList.remove('hide');
+            loadingScreen.classList.remove('active');
             // if (localStorage.lesson_number) {
             //     lessonData = handleLessons.lessons[localStorage.lesson_number];
             // } else {
@@ -898,6 +899,7 @@ function nextLesson() {
         videoLessonContent.classList.remove('active');
         videoLessonContent.children[0].pause();
     }
+    loadingScreen.classList.add('active');
     if (localStorage.isArabic == 'false') {
         if (cur_lesson <= 614 && cur_level <= 614) {
             // print("Yes");
@@ -922,6 +924,7 @@ function nextLesson() {
         }
     }
     restartLesson();
+    loadingScreen.classList.remove('active');
 }
 function disabledButton(button) {
     button.classList.add('disabled');
