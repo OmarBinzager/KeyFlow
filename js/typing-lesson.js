@@ -465,7 +465,7 @@ const starSound = new AudioContext();
 
 function StarSoundStart() {
     // Load the sound file asynchronously
-    fetch('../sounds/success_bell-6776 (1).mp3')
+    fetch('../js/sounds/success_bell-6776 (1).mp3')
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => errorSound.decodeAudioData(arrayBuffer))
         .then((audioBuffer) => {
