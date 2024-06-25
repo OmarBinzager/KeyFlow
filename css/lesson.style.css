@@ -816,6 +816,10 @@ object {
     margin: 10px 20px;
     padding: 0 8px;
 }
+/* .lesson-levels .container .cards-list .lesson-card.test {
+    height: 300px;
+    width: 200px;
+} */
 .lesson-levels .container .cards-list .lesson-card.video{
     background-image: url('../img/25481.jpg');
     background-size: contain;

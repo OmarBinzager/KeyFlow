@@ -1,22 +1,29 @@
 // declaration
 let lessonData;
 let lessonInfo = {
+    type: '',
     name: '',
     text: '',
     level: 0,
-    require_speed: 0
+    speed: 0,
+    goal_wpm: 0,
+    min_wpm: 0,
+    accuracy: 0,
 };
-
 let words;
 let totalLetters;
 let lines = [];
 let tokens = [];
 let cur_line;
 let cur_token;
+let upperKeyboard = false;
 let cur_letter;
+let cur_lesson;
+let ar_cur_lesson;
 let KeyboardLetters = document.querySelectorAll(
     '.keyboard .edc-st1.edc-st2.bld'
 );
+let sideKeyboardLetters = document.querySelectorAll('.followed');
 let activeKeyLetter;
 let wrongLetter;
 let correctLetter;
@@ -26,18 +33,33 @@ let holderIndexToken = 0;
 const fixedUpDownS = 0.4;
 const fixedUpDown = 75 + fixedUpDownS;
 let margintop = 0;
+let cur_test = 0;
+if (localStorage.cur_test) {
+    cur_test = parseInt(localStorage.cur_test);
+} else {
+    localStorage.setItem('cur_test', 0);
+}
+let ar_cur_test = 0;
+if (localStorage.ar_cur_test) {
+    ar_cur_test = parseInt(localStorage.ar_cur_test);
+} else {
+    localStorage.setItem('ar_cur_test', 0);
+}
 let canType = true;
 let canBack = false;
 let keydown = 0;
 let wrongLettersCount = 0;
 let rightLettersCount = 0;
-let testLevel = 0;
 let accuracy = 0;
 let speed = 0;
 let duration = 0.0;
 let seconds = 0;
 let durationCounter;
 let started = false;
+let lessonsList = document.querySelector(
+    '.lesson-levels .container .cards-list'
+);
+let lessonsLevelsScreen = document.querySelector('.lesson-levels');
 let shiftRightKey = document.querySelectorAll('.shift-right');
 let shiftLeftKey = document.querySelectorAll('.shift-left');
 let neutralRight = document.getElementById('neutral-right');
@@ -51,52 +73,305 @@ let starsHolder = document.querySelectorAll('.end-lesson .popup .rate i');
 let nextButton = document.querySelector('.end-lesson .popup button.next');
 let prevButton = document.querySelector('.end-lesson .popup button.prev');
 let congrats = document.querySelector('.end-lesson .popup p.final-word');
+let typingLessonContent = document.getElementById('typing-lesson-content');
 let loadingScreen = document.querySelector('.loading-screen');
-let play_bause_btn = document.querySelector('.control-bar button');
-let lessonName = document.querySelector('.control-bar p.lesson-name');
-let ContainerTestLessonCard = document.querySelector('.choose-test-level');
-let testLessonCard = document.querySelectorAll('.choose-test-level .tl');
+let play_bause_btn = document.querySelector('.control-bar .btns .play');
+let lessonName = document.querySelector('.control-bar p');
+let langButtons = document.querySelectorAll('input[type=radio].lang');
 
 let wait = null;
 let storeLessonData;
-testLessonCard.forEach((tl) =>
-    tl.addEventListener('click', () => {
-        testLevel = tl.dataset.id;
-        print(testLevel);
-        ContainerTestLessonCard.classList.add('hide');
-        getLesson(lessonInfo);
-    })
-);
-function getLesson(lessonObj) {
+
+// langButtons.forEach((l) => {
+//     l.onclick = ListLessonsCards();
+// });
+getLessons();
+function ListLessonsCards(lessons) {
+    // let langRadio = document.querySelector('input[type=radio].lang:checked').value;
+    // print(langRadio);
+    // if (langRadio == 'en') {
+    //     localStorage.isArabic = false;
+    // } else {
+    //     localStorage.isArabic = true;
+    // }
+    let progress = [];
+
+    if (localStorage.isArabic == 'false') {
+        progress = JSON.parse(localStorage.testProgress);
+    } else {
+        progress = JSON.parse(localStorage.ArTestProgress);
+    }
+    // print('cleared with lang: ' + lessons[2].name);
+    lessonsList.innerHTML = '';
+    lessons.forEach((l, index) => {
+        generateLessonCard(
+            l.level,
+            l.name,
+            l.goal_wpm,
+            (index > cur_test && localStorage.isArabic == 'false') ||
+                (index > ar_cur_test && localStorage.isArabic == 'true'),
+            progress.filter((l) => l.lessonId == index)[0]
+        );
+    });
+}
+function generateLessonCard(
+    id,
+    title,
+    reqSpeed,
+    notAccessed,
+    lessonInfo
+) {
+    let card = '';
+    if (notAccessed) {
+            card = `
+            <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="text">
+                <h4 class="title">${id + 1}: ${title}</h4>
+                <p class="requiered">Goal: <span>${reqSpeed}</span>wpm</p>
+            </div>
+        `;
+    } else {
+        if (lessonInfo != undefined) {
+            stars = '';
+            if (lessonInfo.stars > 0) {
+                for (var i = 1; i <= 5; i++) {
+                    if (i <= lessonInfo.stars) {
+                        stars += `<i class="fas fa-star active"></i>`;
+                    } else {
+                        stars += `<i class="fas fa-star"></i>`;
+                    }
+                }
+            } else {
+                stars = `
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            `;
+            }
+            card = `
+        <div class="stars">
+            ${stars}
+        </div>
+        <div class="text">
+            <h4 class="title">${id + 1}: ${title}</h4>
+            ${`<p class="requiered">speed: <span>${lessonInfo.speed}</span>wpm<br>
+                                    accuracy: ${lessonInfo.accuracy}%</p>`}
+        </div>
+    `;
+        } else {
+            card = `
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="text">
+                    <h4 class="title">${id + 1}: ${title}</h4>
+                    <p class="requiered">Goal: <span>${reqSpeed}</span>wpm</p>
+                </div>
+            `;
+        }
+    }
+    let lessonCard = document.createElement('div');
+    lessonCard.classList.add('lesson-card');
+    if (notAccessed) {
+        lessonCard.classList.add('not-accessed');
+    }
+    lessonCard.dataset.id = id;
+    lessonCard.innerHTML = card;
+    lessonsList.appendChild(lessonCard);
+    if (!notAccessed) {
+        lessonCard.onclick = function () {
+            lessonsLevelsScreen.classList.add('hide');
+            loadingScreen.classList.add('active');
+            let lessonId = this.dataset.id;
+            if (localStorage.isArabic == 'false') {
+                cur_lesson = lessonId;
+            } else {
+                ar_cur_lesson = lessonId;
+            }
+            getLesson(lessonId);
+        };
+    }
+}
+// getLesson(lessonInfo, lessonId = undefined);
+function handleLesson(lessonData) {
+    lessonInfo.type = lessonData.type;
+    lessonInfo.name = lessonData.name;
+    lessonInfo.level = lessonData.level;
+    lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+    lessonInfo.text = lessonData.text;
+    lessonInfo.stars = lessonData.stars;
+    lessonInfo.speed = lessonData.speed;
+    lessonInfo.goal_wpm = lessonData.goal_wpm;
+    lessonInfo.min_wpm = lessonData.min_wpm;
+    lessonInfo.accuracy = lessonData.accuracy;
+    typingLessonContent.style.display = 'block';
+    //
+    lessonInfo.type;
+    words = lessonInfo.text.split(' ');
+    totalLetters = lessonInfo.text.length;
+    generateLesson(lessonInfo);
+    cur_line = lines[0];
+    cur_token = tokens[0];
+    cur_letter = cur_token.children[0];
+    setLetter(cur_letter.textContent);
+    cur_letter.classList.add('cur');
+}
+function backToLessonsList() {
     loadingScreen.classList.add('active');
-    setTimeout(() => {
-        loadingScreen.classList.remove('active');
-    }, 3 * 1000);
+    lessonsLevelsScreen.classList.add('hide');
+    getLessons();
+    typingLessonContent.style.display = 'none';
+    holderIndexToken = 0;
+    margintop = 0;
+    tokens = [];
+    indexes = { cur_line_index: 0, cur_token_index: 0, cur_letter_index: 0 };
+    canType = true;
+    canBack = false;
+    keydown = 0;
+    wrongLettersCount = 0;
+    rightLettersCount = 0;
+    accuracy = 0;
+    seconds = 0;
+    speed = 0;
+    duration = 0.0;
+    started = false;
+    wait = null;
+    text_container.style.marginTop = '0';
+    resultScreen.classList.remove('active');
+    const wrapper = document.querySelectorAll('.result .progress');
+    wrapper.forEach((w) => (w.innerHTML = ''));
+    congrats.innerHTML = '';
+    lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+    starsHolder.forEach((s) => s.classList.remove('filled'));
+    increaseProgress();
+    lessonsLevelsScreen.classList.remove('hide');
+    loadingScreen.classList.remove('active');
+}
+function getLesson(id) {
     let myRequest = new XMLHttpRequest();
     myRequest.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             let handleLessons = JSON.parse(this.responseText);
-            lessonData = handleLessons.TestLevels[testLevel];
-            // print(lessonData);
-            lessonObj.name = lessonData.name;
-            lessonObj.level = lessonData.level;
-            lessonObj.text = lessonData.text;
-            lessonObj.require_speed = lessonData.require_speed;
-            words = lessonObj.text.split(' ');
-            totalLetters = lessonObj.text.length;
-            generateLesson(lessonObj);
-            cur_line = lines[0];
-            cur_token = tokens[0];
-            cur_letter = cur_token.children[0];
-            setLetter(cur_letter.textContent);
-            cur_letter.classList.add('cur');
-            lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+            handleLesson(handleLessons.lessons[id]);
+            startLesson();
+            loadingScreen.classList.remove('active');
         }
     };
-
-    myRequest.open('GET', '/js/typing-test.json', true);
+    if (localStorage.isArabic == undefined)
+        localStorage.setItem('isArabic', false);
+    else {
+        if (localStorage.isArabic == 'true') {
+            myRequest.open('GET', '../js/typing-test-ar.json', true);
+            text_container.style.direction = 'rtl';
+            convertKeyboardToArabic();
+        } else {
+            myRequest.open('GET', '../js/typing-test-en.json', true);
+            text_container.style.direction = 'ltr';
+            convertKeyboardToEnglish();
+        }
+    }
     myRequest.send();
 }
+
+function getLessons() {
+    lessonsLevelsScreen.classList.add('hide');
+    loadingScreen.classList.add('active');
+    let langRadio = document.querySelector(
+        'input[type=radio].lang:checked'
+    ).value;
+    // print(langRadio);
+    if (langRadio == 'en') {
+        localStorage.isArabic = false;
+        text_container.style.direction = 'ltr';
+    } else {
+        localStorage.isArabic = true;
+        text_container.style.direction = 'rtl';
+    }
+    let myRequest = new XMLHttpRequest();
+    myRequest.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            let handleLessons = JSON.parse(this.responseText);
+            print(handleLesson);
+            ListLessonsCards(handleLessons.lessons);
+            lessonsLevelsScreen.classList.remove('hide');
+            loadingScreen.classList.remove('active');
+            // if (localStorage.lesson_number) {
+            //     lessonData = handleLessons.lessons[localStorage.lesson_number];
+            // } else {
+            //     lessonData = handleLessons.lessons[handleLessons.lesson_id];
+            //     localStorage.setItem('lesson_number', 0);
+            // }
+            // handleLesson(lessonData);
+            // lessonObj.type = lessonData.type;
+            // lessonObj.name = lessonData.name;
+            // lessonObj.level = lessonData.level;
+            // lessonName.innerHTML = `Lesson ${lessonInfo.level}: ${lessonInfo.name}`;
+            // if (lessonObj.type === 'video') {
+            //     typingLessonContent.style.display = 'none';
+            //     videoLessonContent.classList.add('active');
+            //     lessonObj.link = lessonData.link;
+            //     showVideo(lessonObj.link);
+            // } else {
+            //     lessonObj.text = lessonData.text;
+            //     lessonObj.stars = lessonData.stars;
+            //     lessonObj.speed = lessonData.speed;
+            //     lessonObj.goal_wpm = lessonData.goal_wpm;
+            //     lessonObj.min_wpm = lessonData.min_wpm;
+            //     lessonObj.accuracy = lessonData.accuracy;
+            //     videoLessonContent.classList.remove('active');
+            //     typingLessonContent.style.display = 'block';
+            //     //
+            //     lessonObj.type;
+            //     words = lessonObj.text.split(' ');
+            //     totalLetters = lessonObj.text.length;
+            //     generateLesson(lessonObj);
+            //     cur_line = lines[0];
+            //     cur_token = tokens[0];
+            //     cur_letter = cur_token.children[0];
+            //     setLetter(cur_letter.textContent);
+            //     cur_letter.classList.add('cur');
+            // }
+        }
+    };
+    if (localStorage.isArabic == undefined)
+        localStorage.setItem('isArabic', false);
+    else {
+        if (localStorage.isArabic == 'true') {
+            myRequest.open('GET', '../js/typing-test-ar.json', true);
+            text_container.style.direction = 'rtl';
+            convertKeyboardToArabic();
+        } else {
+            myRequest.open('GET', '../js/typing-test-en.json', true);
+            text_container.style.direction = 'ltr';
+            convertKeyboardToEnglish();
+        }
+    }
+    myRequest.send();
+}
+// function showVideo(link) {
+//     let video = videoLessonContent.children[0];
+//     canType = false;
+//     canBack = false;
+//     video.setAttribute('src', link);
+//     setTimeout(() => {
+//         video.play();
+//     }, 3 * 1000);
+//     video.addEventListener('ended', () => {
+//         nextLesson();
+//     });
+// }
 function restartLesson() {
     lowAcurracyPopup.classList.contains('active')
         ? lowAcurracyPopup.classList.remove('active')
@@ -116,7 +391,11 @@ function restartLesson() {
     duration = 0.0;
     started = false;
     wait = null;
-    getLesson(lessonInfo);
+    if (localStorage.isArabic == 'false') {
+        getLesson(cur_lesson);
+    } else {
+        getLesson(ar_cur_lesson);
+    }
     text_container.style.marginTop = '0';
     resultScreen.classList.remove('active');
     const wrapper = document.querySelectorAll('.result .progress');
@@ -126,7 +405,6 @@ function restartLesson() {
     starsHolder.forEach((s) => s.classList.remove('filled'));
     increaseProgress();
 }
-
 const typeSound = new AudioContext();
 
 function typeSoundStart() {
@@ -170,7 +448,7 @@ function StarSoundStart() {
         });
 }
 
-window.addEventListener('keydown', (e) => {
+function handleInputs(e) {
     if (!canType) {
         e.preventDefault();
         return;
@@ -193,32 +471,7 @@ window.addEventListener('keydown', (e) => {
             }
         }, 1000);
     }
-    // print(e.key);
-    if (
-        e.key !== 'Shift' &&
-        e.key !== 'Backspace' &&
-        e.key !== 'CapsLock' &&
-        e.key !== 'Control' &&
-        e.key !== ' ' &&
-        e.key !== 'ArrowRight' &&
-        e.key !== 'ArrowLeft' &&
-        e.key !== 'ArrowUp' &&
-        e.key !== 'ArrowDown' &&
-        e.key !== 'PageDown' &&
-        e.key !== 'PageUp' &&
-        e.key !== 'Insert' &&
-        e.key !== 'Home' &&
-        e.key !== 'End' &&
-        e.key !== 'Delete' &&
-        e.key !== 'NumLock' &&
-        e.key !== 'Clear' &&
-        e.key !== 'MediaPlayPause' &&
-        e.key !== 'MediaTrackNext' &&
-        e.key !== 'MediaTrackPrevious' &&
-        e.key !== 'AudioVolumeUp' &&
-        e.key !== 'AudioVolumeDown' &&
-        e.key !== 'Alt'
-    ) {
+    if (checkNotForbiddenLetter(e.key)) {
         checkInput(e.key);
     } else if (e.key === ' ') {
         checkInput('space');
@@ -229,12 +482,55 @@ window.addEventListener('keydown', (e) => {
         lowAcurracy();
     }
     e.preventDefault();
-});
+}
+function startLesson() {
+    window.addEventListener('keydown', handleInputs);
+}
 
 function lowAcurracy() {
     canBack = false;
     canType = false;
     lowAcurracyPopup.classList.add('active');
+}
+function checkNotForbiddenLetter(key) {
+    // print(key);
+    return (
+        key !== 'Shift' &&
+        key !== 'Backspace' &&
+        key !== 'CapsLock' &&
+        key !== 'Control' &&
+        key !== ' ' &&
+        key !== 'ArrowRight' &&
+        key !== 'ArrowLeft' &&
+        key !== 'ArrowUp' &&
+        key !== 'ArrowDown' &&
+        key !== 'PageDown' &&
+        key !== 'PageUp' &&
+        key !== 'Insert' &&
+        key !== 'Home' &&
+        key !== 'End' &&
+        key !== 'Delete' &&
+        key !== 'NumLock' &&
+        key !== 'Clear' &&
+        key !== 'MediaPlayPause' &&
+        key !== 'MediaTrackNext' &&
+        key !== 'MediaTrackPrevious' &&
+        key !== 'AudioVolumeUp' &&
+        key !== 'AudioVolumeDown' &&
+        key !== 'Alt' &&
+        key !== 'F12' &&
+        key !== 'F11' &&
+        key !== 'F10' &&
+        key !== 'F9' &&
+        key !== 'F8' &&
+        key !== 'F7' &&
+        key !== 'F6' &&
+        key !== 'F5' &&
+        key !== 'F4' &&
+        key !== 'F3' &&
+        key !== 'F2' &&
+        key !== 'Escape'
+    );
 }
 /*
 1 Star (Very Weak): "Meh, it could be better." (Lowers expectations)
@@ -247,6 +543,18 @@ function lowAcurracy() {
 
 5 Stars (Excellent): "Outstanding! You absolutely nailed it!" (Enthusiastic praise)
 */
+if (!localStorage.testProgress) {
+    let progress = [];
+    localStorage.setItem('testProgress', JSON.stringify(progress));
+}
+if (!localStorage.ArTestProgress) {
+    let progress = [];
+    localStorage.setItem('ArTestProgress', JSON.stringify(progress));
+}
+if (!localStorage.isArabic) {
+    let isArabic = false;
+    localStorage.setItem('ArTestProgress', isArabic);
+}
 let congStatement = [
     "<b>Don't give up!</b> There's always another chance to shine.",
     '<b>Meh,</b> it could be better.',
@@ -256,45 +564,55 @@ let congStatement = [
     '<b>Outstanding!</b> You absolutely nailed it!',
 ];
 function showResult() {
+    let lessonResult = {
+        lessonId: lessonInfo.level,
+        accuracy: 0,
+        speed: 0,
+        stars: 0,
+    };
     let starsCount = 0;
-    Math.floor(accuracy) == 100 ? starsCount++ : (starsCount = 0);
-    speed >= lessonInfo.require_speed && speed <= lessonInfo.require_speed + 5
+    Math.floor(accuracy) == 100 && speed >= lessonInfo.min_wpm
+        ? starsCount++
+        : (starsCount = 0);
+    speed == lessonInfo.min_wpm
+        ? (starsCount += 1)
+        : speed > lessonInfo.min_wpm && speed < lessonInfo.goal_wpm
         ? (starsCount += 2)
-        : speed < lessonInfo.require_speed + 13 &&
-          speed > lessonInfo.require_speed + 5
+        : speed == lessonInfo.goal_wpm
         ? (starsCount += 3)
-        : speed > lessonInfo.require_speed + 13
+        : speed > lessonInfo.goal_wpm
         ? (starsCount += 4)
         : (starsCount = 0);
     congrats.innerHTML = congStatement[starsCount];
     let index = 0;
-    let setStars = setInterval(() => {
-        starsHolder[index++].classList.add('filled');
-        StarSoundStart();
-        starsCount--;
-        if (starsCount < 1) {
-            clearInterval(setStars);
-        }
-    }, 500);
+    if (starsCount > 0) {
+        let setStars = setInterval(() => {
+            starsHolder[index++].classList.add('filled');
+            StarSoundStart();
+            starsCount--;
+            if (starsCount < 1) {
+                clearInterval(setStars);
+            }
+        }, 500);
+        enabledButton(nextButton);
+    } else {
+        disabledButton(nextButton);
+    }
     let minutes = Math.floor(seconds / 60);
     let second = seconds % 60;
     timeRsult.innerHTML = `${minutes}:${second < 10 ? `0${second}` : second}`;
     const wrapper = document.querySelectorAll('.result .progress');
-
     const barCount = 50;
     const percent1 = (barCount * Math.round(accuracy)) / 100;
-    const speedBarCount = lessonInfo.require_speed + 25;
-    const percent3 =
-        /*lessonInfo.require_speed*/ (barCount * speed) / speedBarCount;
+    const percent3 = (barCount * speed) / lessonInfo.goal_wpm;
 
     for (let index = 0; index < barCount; index++) {
         const className = index < percent1 ? 'selected1' : '';
         wrapper[0].innerHTML += `<i style="--i: ${index};" class="${className}"></i>`;
     }
-
-    wrapper[0].innerHTML += `<div class='info'><p class="selected percent-text text1">${Math.floor(
-        accuracy
-    )}<span>%</span></p><h4 class="acc">Accuracy</h4></div>`;
+    accuracy = Math.floor(accuracy) >= 100 ? 100 : Math.floor(accuracy);
+    wrapper[0].innerHTML += `<div class='info'><p class="selected percent-text text1">${accuracy}
+    <span>%</span></p><h4 class="acc">Accuracy</h4></div>`;
 
     for (let index = 0; index < barCount; index++) {
         const className = index < percent3 ? 'selected3' : '';
@@ -304,14 +622,71 @@ function showResult() {
     wrapper[1].innerHTML += `<div class='info'>
     <p class="selected percent-text text3">${speed}<span>wpm</span></p>
     <h4 class="speed">Speed</h4>
+    <span class="goal">Goal: ${lessonInfo.goal_wpm} wpm</span>
+    <span class="req-speed">Min Speed: ${lessonInfo.min_wpm} wpm</span>
     </div>`;
+    lessonResult.accuracy = accuracy;
+    lessonResult.speed = speed;
+    lessonResult.stars = starsCount;
+    let progress = [];
+    if (localStorage.isArabic == 'false') {
+        if (localStorage.testProgress) {
+            progress = JSON.parse(localStorage.testProgress);
+            if (cur_lesson == cur_test) {
+                progress.push(lessonResult);
+            } else {
+                progress.map((p, i) => {
+                    if (cur_lesson == p.lessonId) {
+                        progress.splice(index, 1, lessonResult);
+                    }
+                });
+            }
+        }
+        localStorage.setItem('testProgress', JSON.stringify(progress));
+        if (cur_test == cur_lesson) {
+            cur_test++;
+            localStorage.cur_test = cur_test;
+        }
+    } else {
+        if (localStorage.ArTestProgress) {
+            progress = JSON.parse(localStorage.ArTestProgress);
+            if (ar_cur_lesson == ar_cur_test) {
+                progress.push(lessonResult);
+                print('pushed arabic');
+            } else {
+                progress.map((p, i) => {
+                    if (ar_cur_lesson == p.lessonId) {
+                        progress.splice(index, 1, lessonResult);
+                    }
+                });
+                print('inserted arabic');
+            }
+        }
+        localStorage.setItem('ArTestProgress', JSON.stringify(progress));
+        if (ar_cur_test == ar_cur_lesson) {
+            ar_cur_test++;
+            localStorage.ar_cur_test = ar_cur_test;
+        }
+    }
 }
 function checkInput(inputLetter) {
     cur_letter.classList.remove('cur');
     if (inputLetter === 'Tab' || inputLetter === 'Enter') {
         setWrongLetter(inputLetter.toLowerCase());
+        cur_letter.classList.add('err');
     } else {
-        if (inputLetter === cur_letter.textContent) {
+        if (
+            localStorage.isArabic === 'true' &&
+            inputLetter === 'Unidentified'
+        ) {
+            if ('ل' === cur_letter.textContent) {
+                setCorrectLetter(inputLetter.toLowerCase());
+                if (cur_letter.classList.contains('e-v'))
+                    cur_letter.classList.add('err-vld');
+                else cur_letter.classList.add('vld');
+                increaseLetterIndex();
+            }
+        } else if (inputLetter === cur_letter.textContent) {
             setCorrectLetter(inputLetter.toLowerCase());
             if (cur_letter.classList.contains('e-v'))
                 cur_letter.classList.add('err-vld');
@@ -325,13 +700,13 @@ function checkInput(inputLetter) {
             setWrongLetter(inputLetter.toLowerCase());
             cur_letter.classList.add('err');
         }
-        let letterIndex = increaseLetterIndex();
-        if (canType) {
-            cur_letter = cur_token.children[letterIndex];
-            if (cur_letter.innerHTML.length > 1) setLetter('space');
-            else setLetter(cur_letter.textContent);
-            cur_letter.classList.add('cur');
-        }
+    }
+    let letterIndex = increaseLetterIndex();
+    if (canType) {
+        cur_letter = cur_token.children[letterIndex];
+        if (cur_letter.innerHTML.length > 1) setLetter('space');
+        else setLetter(cur_letter.textContent);
+        cur_letter.classList.add('cur');
     }
     keydown++;
     increaseProgress();
@@ -475,11 +850,55 @@ function playBause() {
         play();
     }
 }
+window.onload = function () {
+    typingLessonContent.style.display = 'none';
+};
 function endLesson() {
     stopTyping();
     canType = false;
     resultScreen.classList.add('active');
     showResult();
+    window.removeEventListener('keydown', handleInputs);
+}
+function nextLesson() {
+    loadingScreen.classList.add('active');
+    if (localStorage.isArabic == 'false') {
+        if (cur_lesson <= 2 && cur_test <= 2) {
+            // print("Yes");
+            if (cur_test == cur_lesson) {
+                cur_test++;
+                localStorage.cur_test = cur_test;
+            }
+            cur_lesson++;
+        } else {
+            disabledButton(nextButton);
+        }
+    } else {
+        if (ar_cur_lesson <= 365 && ar_cur_test <= 365) {
+            // print("Yes");
+            if (ar_cur_test == ar_cur_lesson) {
+                ar_cur_test++;
+                localStorage.ar_cur_test = ar_cur_test;
+            }
+            ar_cur_lesson++;
+        } else {
+            disabledButton(nextButton);
+        }
+    }
+    restartLesson();
+    loadingScreen.classList.remove('active');
+}
+function disabledButton(button) {
+    button.classList.add('disabled');
+    button.disabled = true;
+}
+function enabledButton(button) {
+    button.classList.remove('disabled');
+    button.disabled = false;
+}
+function previousLesson() {
+    cur_lesson--;
+    restartLesson();
 }
 function setCorrectLetter(letter) {
     rightLettersCount++;
@@ -490,7 +909,6 @@ function setCorrectLetter(letter) {
         correctLetterHide(correctLetter);
     }, 200);
 }
-
 function generateLesson(lessonInfo) {
     const line = document.createElement('span');
     line.classList.add('line');
@@ -554,11 +972,15 @@ function stopTyping() {
 function setLetter(letter) {
     // setTimeout(() => {
     if (activeKeyLetter) toggleKeyLetter(activeKeyLetter);
+    if (localStorage.isArabic === 'true') {
+    }
+    // print(letter);
+    // print(isUpper(letter))
+    // print(!Number.parseInt(letter))
+    // print( isShiftChar(letter))
     if (
-        isUpper(letter) &&
-        !Number.parseInt(letter) &&
-        letter !== '0' &&
-        !isSpecialChar(letter)
+        (isUpper(letter) && localStorage.isArabic == 'false') ||
+        (!Number.parseInt(letter) && isShiftChar(letter))
     ) {
         keyboardToUpper();
         setKeyActive(letter.toLowerCase());
@@ -573,42 +995,168 @@ function setLetter(letter) {
             addActiveKey(shiftRightKey);
         }
     } else {
-        if (
-            shiftLeftKey[0].classList.contains('active') ||
-            shiftRightKey[0].classList.contains('active')
-        ) {
-            removeActiveKey(shiftLeftKey);
-            removeActiveKey(shiftRightKey);
-        }
-        if (isLeftLetter(setKeyActive(letter))) {
-            activateRightNeutral();
-            unactivateLeftNeutral();
+        if (localStorage.isArabic == 'true') {
+            if (
+                shiftLeftKey[0].classList.contains('active') ||
+                shiftRightKey[0].classList.contains('active')
+            ) {
+                removeActiveKey(shiftLeftKey);
+                removeActiveKey(shiftRightKey);
+            }
+            if (isLeftLetter(setArabicKeyActive(letter))) {
+                activateRightNeutral();
+                unactivateLeftNeutral();
+            } else {
+                activateLeftNeutral();
+                unctivateRightNeutral();
+            }
+            keyboardToLower();
+            activeKeyLetter ? toggleKeyLetter(activeKeyLetter) : null;
         } else {
-            activateLeftNeutral();
-            unctivateRightNeutral();
+            if (
+                shiftLeftKey[0].classList.contains('active') ||
+                shiftRightKey[0].classList.contains('active')
+            ) {
+                removeActiveKey(shiftLeftKey);
+                removeActiveKey(shiftRightKey);
+            }
+            if (isLeftLetter(setKeyActive(letter))) {
+                activateRightNeutral();
+                unactivateLeftNeutral();
+            } else {
+                activateLeftNeutral();
+                unctivateRightNeutral();
+            }
+            keyboardToLower();
+            activeKeyLetter ? toggleKeyLetter(activeKeyLetter) : null;
         }
-        keyboardToLower();
-        activeKeyLetter ? toggleKeyLetter(activeKeyLetter) : null;
     }
     // }, 0);
 }
-
 function isRightLetter(letter) {
+    if (localStorage.isArabic == 'false') {
+        if (
+            letter == 'P' ||
+            letter == 'O' ||
+            letter == 'I' ||
+            letter == 'U' ||
+            letter == 'Y' ||
+            letter == 'M' ||
+            letter == 'N' ||
+            letter == 'L' ||
+            letter == 'K' ||
+            letter == 'J' ||
+            letter == 'H' ||
+            letter == ':' ||
+            letter == '"' ||
+            letter == '|' ||
+            letter == '+' ||
+            letter == '/' ||
+            letter == ')' ||
+            letter == '(' ||
+            letter == '*' ||
+            letter == '&' ||
+            letter == '^' ||
+            letter == '?' ||
+            letter == '>' ||
+            letter == '<' ||
+            letter == '{' ||
+            letter == '}'
+        )
+            return true;
+        else return false;
+    } else {
+        if (
+            letter == '؛' || //(>؛×÷‘إأـ،/:"؟.,’آ+_()*&^")
+            letter == '×' ||
+            letter == '÷' ||
+            letter == '‘' ||
+            letter == 'إ' ||
+            letter == '’' ||
+            letter == 'آ' ||
+            letter == '/' ||
+            letter == '،' ||
+            letter == 'ـ' ||
+            letter == 'أ' ||
+            letter == 'إ' ||
+            letter == ':' ||
+            letter == '"' ||
+            letter == '|' ||
+            letter == '+' ||
+            letter == '_' ||
+            letter == '(' ||
+            letter == ')' ||
+            letter == '*' ||
+            letter == '&' ||
+            letter == '^' ||
+            letter == '؟' ||
+            letter == '.' ||
+            letter == ',' ||
+            letter == '>' ||
+            letter == '<'
+        )
+            return true;
+        else return false;
+    }
+}
+function isLeftLetter(letter) {
+    if (localStorage.isArabic == 'false') {
+        if (
+            letter == '' ||
+            letter == 'w' ||
+            letter == 'e' ||
+            letter == 'r' ||
+            letter == 't' ||
+            letter == 'a' ||
+            letter == 's' ||
+            letter == 'd' ||
+            letter == 'f' ||
+            letter == 'g' ||
+            letter == 'z' ||
+            letter == 'x' ||
+            letter == 'c' ||
+            letter == 'v' ||
+            letter == 'b' ||
+            letter == 'tab' ||
+            letter == '~' ||
+            letter == '1' ||
+            letter == '2' ||
+            letter == '3' ||
+            letter == '4' ||
+            letter == '5'
+        )
+            return true;
+        else return false;
+    } else {
+        if (
+            letter == 'ذ' ||
+            letter == '1' ||
+            letter == '2' ||
+            letter == '3' ||
+            letter == '4' ||
+            letter == '5' ||
+            letter == 'ض' ||
+            letter == 'ص' ||
+            letter == 'ث' ||
+            letter == 'ق' ||
+            letter == 'ف' ||
+            letter == 'ل' ||
+            letter == 'ب' ||
+            letter == 'ي' ||
+            letter == 'س' ||
+            letter == 'ش' ||
+            letter == 'ؤ' ||
+            letter == 'ر' ||
+            letter == 'ء' ||
+            letter == 'ئ' ||
+            letter == 'لا'
+        )
+            return true;
+        else return false;
+    }
+}
+function isShiftChar(letter) {
     if (
-        letter == 'P' ||
-        letter == 'O' ||
-        letter == 'I' ||
-        letter == 'U' ||
-        letter == 'Y' ||
-        letter == 'M' ||
-        letter == 'N' ||
-        letter == 'L' ||
-        letter == 'K' ||
-        letter == 'J' ||
-        letter == 'H' ||
-        letter == ':' ||
-        letter == '"' ||
-        letter == '|' ||
         letter == '+' ||
         letter == '_' ||
         letter == ')' ||
@@ -616,59 +1164,58 @@ function isRightLetter(letter) {
         letter == '*' ||
         letter == '&' ||
         letter == '^' ||
-        letter == '?' ||
+        letter == '%' ||
+        letter == '$' ||
+        letter == '#' ||
+        letter == '@' ||
+        letter == '!' ||
+        letter == '}' ||
+        letter == '{' ||
+        letter == '"' ||
+        letter == ':' ||
         letter == '>' ||
         letter == '<' ||
-        letter == '{' ||
-        letter == '}'
-    )
-        return true;
-    else return false;
-}
-function isLeftLetter(letter) {
-    if (
-        letter == 'q' ||
-        letter == 'w' ||
-        letter == 'e' ||
-        letter == 'r' ||
-        letter == 't' ||
-        letter == 'a' ||
-        letter == 's' ||
-        letter == 'd' ||
-        letter == 'f' ||
-        letter == 'g' ||
-        letter == 'z' ||
-        letter == 'x' ||
-        letter == 'c' ||
-        letter == 'v' ||
-        letter == 'b' ||
-        letter == 'tab' ||
         letter == '~' ||
-        letter == '1' ||
-        letter == '2' ||
-        letter == '3' ||
-        letter == '4' ||
-        letter == '5'
+        letter == '|'
     )
         return true;
-    else return false;
-}
-function isSpecialChar(letter) {
-    if (
-        letter == '=' ||
-        letter == '-' ||
-        letter == ']' ||
-        letter == '[' ||
-        letter == "'" ||
-        letter == ';' ||
-        letter == '/' ||
-        letter == '\\' ||
-        letter == '.' ||
-        letter == ',' ||
-        letter == '`'
-    )
-        return true;
-    else return false;
+    if (localStorage.isArabic == 'false') {
+        if (letter == '?' || letter == '~') return true;
+        else return false;
+    } else {
+        if (
+            letter == '؛' || //(>؛×÷‘إأـ،/:"؟.,’آ+_()*&^")
+            letter == '×' ||
+            letter == '÷' ||
+            letter == '‘' ||
+            letter == 'إ' ||
+            letter == '’' ||
+            letter == 'آ' ||
+            letter == '/' ||
+            letter == '،' ||
+            letter == 'أ' ||
+            letter == 'إ' ||
+            letter == '؟' ||
+            letter == 'ّ' ||
+            letter == 'َ' ||
+            letter == 'ً' ||
+            letter == 'ُ' ||
+            letter == 'ٌ' ||
+            letter == 'لإ' ||
+            letter == 'ِ' ||
+            letter == 'ٍ' ||
+            letter == ']' ||
+            letter == '[' ||
+            letter == 'لأ' ||
+            letter == 'لآ' ||
+            letter == 'ْ' ||
+            letter == '' ||
+            letter == '.' ||
+            letter == ','
+        )
+            return true;
+        else return false;
+    }
 }
 function toggleKeyLetter(collection) {
     for (let i = 0; i < collection.length; i++) {
@@ -729,18 +1276,233 @@ function incorrectLetterHide(collection) {
 //     // }, 0);
 // }
 function keyboardToLower() {
-    KeyboardLetters[0].innerHTML !== KeyboardLetters[0].innerHTML.toLowerCase()
+    upperKeyboard == true
         ? KeyboardLetters.forEach(
               (l) => (l.innerHTML = l.innerHTML.toLowerCase())
           )
         : null;
+    upperKeyboard = false;
 }
 function keyboardToUpper() {
-    KeyboardLetters[0].innerHTML !== KeyboardLetters[0].innerHTML.toUpperCase()
+    upperKeyboard == false
         ? KeyboardLetters.forEach(
               (l) => (l.innerHTML = l.innerHTML.toUpperCase())
           )
         : null;
+    upperKeyboard = true;
+}
+function convertKeyboardToArabic() {
+    KeyboardLetters.forEach((l) => {
+        l.innerHTML = keysToArabic(l.textContent.toLowerCase());
+    });
+    sideKeyboardLetters.forEach((l) => {
+        l.innerHTML = sideKeyToArabic(l.textContent.toLocaleLowerCase());
+    });
+}
+function convertKeyboardToEnglish() {
+    KeyboardLetters.forEach((l) => {
+        l.innerHTML = keysToEnglish(l.textContent.toLowerCase());
+    });
+    sideKeyboardLetters.forEach((l) => {
+        l.innerHTML = sideKeyToEnglish(l.textContent.toLocaleLowerCase());
+    });
+}
+function sideKeyToArabic(letter) {
+    let result = '';
+    letter === '~'
+        ? (result = '')
+        : letter === '{'
+        ? (result = '<')
+        : letter === '}'
+        ? (result = '>')
+        : letter === '"'
+        ? (result = '"')
+        : letter === ':'
+        ? (result = ':')
+        : letter === '?'
+        ? (result = '؟')
+        : letter === '>'
+        ? (result = '.')
+        : letter === '<'
+        ? (result = ',')
+        : letter === ')'
+        ? (result = '(')
+        : letter === '('
+        ? (result = ')')
+        : (result = letter);
+    return result;
+}
+function keysToArabic(letter) {
+    let result = '';
+    letter === '`'
+        ? (result = 'ذ')
+        : letter === 'q'
+        ? (result = 'ض')
+        : letter === 'w'
+        ? (result = 'ص')
+        : letter === 'e'
+        ? (result = 'ث')
+        : letter === 'r'
+        ? (result = 'ق')
+        : letter === 't'
+        ? (result = 'ف')
+        : letter === 'y'
+        ? (result = 'غ')
+        : letter === 'u'
+        ? (result = 'ع')
+        : letter === 'i'
+        ? (result = 'ه')
+        : letter === 'o'
+        ? (result = 'خ')
+        : letter === 'p'
+        ? (result = 'ح')
+        : letter === '['
+        ? (result = 'ج')
+        : letter === ']'
+        ? (result = 'د')
+        : letter === 'a'
+        ? (result = 'ش')
+        : letter === 's'
+        ? (result = 'س')
+        : letter === 'd'
+        ? (result = 'ي')
+        : letter === 'f'
+        ? (result = 'ب')
+        : letter === 'g'
+        ? (result = 'ل')
+        : letter === 'h'
+        ? (result = 'ا')
+        : letter === 'j'
+        ? (result = 'ت')
+        : letter === 'k'
+        ? (result = 'ن')
+        : letter === 'l'
+        ? (result = 'م')
+        : letter === ';'
+        ? (result = 'ك')
+        : letter === "'"
+        ? (result = 'ط')
+        : letter === 'z'
+        ? (result = 'ئ')
+        : letter === 'x'
+        ? (result = 'ء')
+        : letter === 'c'
+        ? (result = 'ؤ')
+        : letter === 'v'
+        ? (result = 'ر')
+        : letter === 'b'
+        ? (result = 'لا')
+        : letter === 'n'
+        ? (result = 'ى')
+        : letter === 'm'
+        ? (result = 'ة')
+        : letter === ','
+        ? (result = 'و')
+        : letter === '.'
+        ? (result = 'ز')
+        : letter === '/'
+        ? (result = 'ظ')
+        : (result = letter);
+    return result;
+}
+
+function sideKeyToEnglish(letter) {
+    let result = '';
+    letter === ''
+        ? (result = '~')
+        : letter === '<'
+        ? (result = '{')
+        : letter === '>'
+        ? (result = '}')
+        : letter === '"'
+        ? (result = '"')
+        : letter === ':'
+        ? (result = ':')
+        : letter === '؟'
+        ? (result = '?')
+        : letter === '.'
+        ? (result = '>')
+        : letter === ','
+        ? (result = '<')
+        : letter === '('
+        ? (result = ')')
+        : letter === ')'
+        ? (result = '(')
+        : (result = letter);
+    return result;
+}
+function keysToEnglish(letter) {
+    let result = '';
+    letter === 'ذ'
+        ? (result = '`')
+        : letter === 'ض'
+        ? (result = 'q')
+        : letter === 'ص'
+        ? (result = 'w')
+        : letter === 'ث'
+        ? (result = 'e')
+        : letter === 'ق'
+        ? (result = 'r')
+        : letter === 'ف'
+        ? (result = 't')
+        : letter === 'غ'
+        ? (result = 'y')
+        : letter === 'ع'
+        ? (result = 'u')
+        : letter === 'ه'
+        ? (result = 'i')
+        : letter === 'خ'
+        ? (result = 'o')
+        : letter === 'ح'
+        ? (result = 'p')
+        : letter === 'ج'
+        ? (result = '[')
+        : letter === 'د'
+        ? (result = ']')
+        : letter === 'ش'
+        ? (result = 'a')
+        : letter === 'س'
+        ? (result = 's')
+        : letter === 'ي'
+        ? (result = 'd')
+        : letter === 'ب'
+        ? (result = 'f')
+        : letter === 'ل'
+        ? (result = 'g')
+        : letter === 'ا'
+        ? (result = 'h')
+        : letter === 'ت'
+        ? (result = 'j')
+        : letter === 'ن'
+        ? (result = 'k')
+        : letter === 'م'
+        ? (result = 'l')
+        : letter === 'ك'
+        ? (result = ';')
+        : letter === 'ط'
+        ? (result = "'")
+        : letter === 'ئ'
+        ? (result = 'z')
+        : letter === 'ء'
+        ? (result = 'x')
+        : letter === 'ؤ'
+        ? (result = 'c')
+        : letter === 'ر'
+        ? (result = 'v')
+        : letter === 'لا'
+        ? (result = 'b')
+        : letter === 'ى'
+        ? (result = 'n')
+        : letter === 'ة'
+        ? (result = 'm')
+        : letter === 'و'
+        ? (result = ',')
+        : letter === 'ز'
+        ? (result = '.')
+        : letter === 'ظ'
+        ? (result = '/')
+        : (result = letter);
+    return result;
 }
 
 function setKeyActive(letter) {
@@ -748,9 +1510,15 @@ function setKeyActive(letter) {
     activeKeyLetter = document.getElementsByClassName(id);
     return id;
 }
+function setArabicKeyActive(letter) {
+    let id = clearInput(letter);
+    activeKeyLetter = document.getElementsByClassName(id);
+    return letter;
+}
 function setKeyCorrect(letter) {
     let id = clearInput(letter);
     correctLetter = document.getElementsByClassName(id);
+    // print(id);
     return id;
 }
 function setKeyWrong(letter) {
@@ -760,49 +1528,147 @@ function setKeyWrong(letter) {
 }
 function clearInput(letter) {
     let id = '';
-    letter == '['
-        ? (id = '{')
-        : letter == ']'
-        ? (id = '}')
-        : letter == '"'
-        ? (id = "'")
-        : letter == ':'
-        ? (id = ';')
-        : letter == '|'
-        ? (id = '\\')
-        : letter == '+'
-        ? (id = '=')
-        : letter == '_'
-        ? (id = '-')
-        : letter == ')'
-        ? (id = '0')
-        : letter == '('
-        ? (id = '9')
-        : letter == '*'
-        ? (id = '8')
-        : letter == '&'
-        ? (id = '7')
-        : letter == '^'
-        ? (id = '6')
-        : letter == '%'
-        ? (id = '5')
-        : letter == '$'
-        ? (id = '4')
-        : letter == '#'
-        ? (id = '3')
-        : letter == '@'
-        ? (id = '2')
-        : letter == '!'
-        ? (id = '1')
-        : letter == '`'
-        ? (id = '~')
-        : letter == '?'
-        ? (id = '/')
-        : letter == '>'
-        ? (id = '.')
-        : letter == '<'
-        ? (id = ',')
-        : (id = letter);
+    if (localStorage.isArabic == 'false') {
+        letter == '['
+            ? (id = '{')
+            : letter == ']'
+            ? (id = '}')
+            : letter == '"'
+            ? (id = "'")
+            : letter == ':'
+            ? (id = ';')
+            : letter == '|'
+            ? (id = '\\')
+            : letter == '+'
+            ? (id = '=')
+            : letter == '_'
+            ? (id = '-')
+            : letter == ')'
+            ? (id = '0')
+            : letter == '('
+            ? (id = '9')
+            : letter == '*'
+            ? (id = '8')
+            : letter == '&'
+            ? (id = '7')
+            : letter == '^'
+            ? (id = '6')
+            : letter == '%'
+            ? (id = '5')
+            : letter == '$'
+            ? (id = '4')
+            : letter == '#'
+            ? (id = '3')
+            : letter == '@'
+            ? (id = '2')
+            : letter == '!'
+            ? (id = '1')
+            : letter == '`'
+            ? (id = '~')
+            : letter == '?'
+            ? (id = '/')
+            : letter == '>'
+            ? (id = '.')
+            : letter == '<'
+            ? (id = ',')
+            : (id = letter);
+    } else {
+        letter == 'ج' || letter == '<'
+            ? (id = '{')
+            : letter == 'د' || letter == '>'
+            ? (id = '}')
+            : letter == 'ط' || letter == '"'
+            ? (id = "'")
+            : letter == 'ك' || letter == ':'
+            ? (id = ';')
+            : letter == '|'
+            ? (id = '\\')
+            : letter == '+'
+            ? (id = '=')
+            : letter == '_'
+            ? (id = '-')
+            : letter == '('
+            ? (id = '0')
+            : letter == ')'
+            ? (id = '9')
+            : letter == '*'
+            ? (id = '8')
+            : letter == '&'
+            ? (id = '7')
+            : letter == '^'
+            ? (id = '6')
+            : letter == '%'
+            ? (id = '5')
+            : letter == '$'
+            ? (id = '4')
+            : letter == '#'
+            ? (id = '3')
+            : letter == '@'
+            ? (id = '2')
+            : letter == '!'
+            ? (id = '1')
+            : letter == 'ذ' || letter == 'ّ'
+            ? (id = '~')
+            : letter == 'ظ' || letter == '؟'
+            ? (id = '/')
+            : letter == 'ز' || letter == '.'
+            ? (id = '.')
+            : letter == 'و' || letter == ','
+            ? (id = ',')
+            : letter == 'ض' || letter == `َ`
+            ? (id = 'q')
+            : letter == 'ص' || letter == `ً`
+            ? (id = 'w')
+            : letter == 'ث' || letter == `ُ`
+            ? (id = 'e')
+            : letter == 'ق' || letter == `ٌ`
+            ? (id = 'r')
+            : letter == 'ف' || letter == `لإ`
+            ? (id = 't')
+            : letter == 'غ' || letter == `إ`
+            ? (id = 'y')
+            : letter == 'ع' || letter == `‘`
+            ? (id = 'u')
+            : letter == 'ه' || letter == `÷`
+            ? (id = 'i')
+            : letter == 'خ' || letter == `×`
+            ? (id = 'o')
+            : letter == 'ح' || letter == `؛`
+            ? (id = 'p')
+            : letter == 'ش' || letter == `ِ`
+            ? (id = 'a')
+            : letter == 'س' || letter == `ٍ`
+            ? (id = 's')
+            : letter == 'ي' || letter == `]`
+            ? (id = 'd')
+            : letter == 'ب' || letter == `[`
+            ? (id = 'f')
+            : letter == 'ل' || letter == `لأ`
+            ? (id = 'g')
+            : letter == 'ا' || letter == `أ`
+            ? (id = 'h')
+            : letter == 'ت' || letter == `ـ`
+            ? (id = 'j')
+            : letter == 'ن' || letter == `،`
+            ? (id = 'k')
+            : letter == 'م' || letter == `/`
+            ? (id = 'l')
+            : letter == 'ئ' || letter == `~`
+            ? (id = 'z')
+            : letter == 'ء' || letter == `ْ`
+            ? (id = 'x')
+            : letter == 'ؤ' || letter == `}`
+            ? (id = 'c')
+            : letter == 'ر' || letter == `{`
+            ? (id = 'v')
+            : letter == 'unidentified' || letter == `لآ`
+            ? (id = 'b')
+            : letter == 'ى' || letter == `آ`
+            ? (id = 'n')
+            : letter == 'ة' || letter == `’`
+            ? (id = 'm')
+            : (id = letter);
+    }
     return id;
 }
 function isUpper(letter) {

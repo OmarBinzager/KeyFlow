@@ -1,0 +1,20 @@
+{
+
+    "lessons": [
+        {
+            "name": "Beginner Test",
+            "level":0, "goal_wpm": 28, "min_wpm": 10,
+            "text":"The quick brown fox jumps over the lazy dog. Can you type this whole sentence without stopping? Try it a few times and see how fast you can go! Remember, accuracy is important too, so don't rush so much that you make mistakes. Keep practicing, and you'll be a typing whiz in no time!"
+        },
+        {
+            "name": "Intermediate Test",
+            "level":1, "goal_wpm": 40, "min_wpm": 10,
+            "text":"Exotic spices from Zanzibar fill the bustling marketplace with vibrant aromas. 88 Cardamom mingles with ginger, and the earthy scent of turmeric hangs heavy in the air. 152 Silk scarves shimmer in every color imaginable, 083 their textures a delightful contrast to the smooth, polished wood of handcrafted statues.  Can you navigate these sights and smells, bargaining for treasures with the local merchants?"
+        },
+        {
+            "name": "Profissional Test",
+            "level":2, "goal_wpm": 58, "min_wpm": 10,
+            "text":"Test your professional typing prowess with this passage! Navigate through a labyrinth of numbers, showcasing your accuracy and speed. Can you conquer 87 quirky quadrigilions (that's 87 followed by 15 zeros) and 31 effervescent septillions (31 followed by 24 zeros) while meticulously maintaining precision? Remember, professional typists often strive to surpass 80 words per minute (WPM) with exceptional accuracy. So, buckle down, unleash your inner typing champion, and let's see what stellar score you can achieve!"
+        }
+    ]
+}

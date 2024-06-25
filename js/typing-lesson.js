@@ -627,11 +627,6 @@ function showResult() {
     } else {
         disabledButton(nextButton);
     }
-    if (localStorage.cur_Level <= 0) {
-        disabledButton(prevButton);
-    } else {
-        enabledButton(prevButton);
-    }
     let minutes = Math.floor(seconds / 60);
     let second = seconds % 60;
     timeRsult.innerHTML = `${minutes}:${second < 10 ? `0${second}` : second}`;
