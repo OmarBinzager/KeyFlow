@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'Droid Sans Mono';
+    src: url('../webfonts/DroidSansMono.ttf');
+}
+
 :root {
     --prog-color: #78b8ff;
     --tran-line: -73.76px;
@@ -23,8 +28,7 @@ body {
     -moz-osx-font-smoothing: auto;
     -webkit-box-sizing: initial;
     box-sizing: initial;
-    font-family: "Droid Sans Mono",
-        courier;
+    font-family: sans-serif;
 }
 
 object {
@@ -797,7 +801,18 @@ object {
     justify-content: center;
     overflow-y:scroll !important;
     -ms-overflow-style: none;
-    scrollbar-width: none;
+}
+::-webkit-scrollbar {
+    background-color: #3c40445b;
+    width: 12px;
+    border-radius: 10px;
+
+}
+::-webkit-scrollbar-thumb {
+    background-color: #a19db7;
+    border-radius: 10px;
+    width: 12px;
+    transition: background-color 0.3s ease;
 }
 .lesson-levels .container .cards-list .lesson-card {
     background: white url('../img/Typing-bro (1).png');
@@ -889,7 +904,6 @@ object {
     z-index: 3;
     text-align: center;
     font-size: 18px;
-    font-family: "Droid Sans Mono" !important; 
     display: flex;
     flex-direction: column;
     padding: 8px 10px;

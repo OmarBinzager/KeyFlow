@@ -666,7 +666,7 @@ function showResult() {
             } else {
                 progress.map((p, i) => {
                     if (cur_lesson == p.lessonId) {
-                        progress.splice(index, 1, lessonResult);
+                        progress.splice(i, 1, lessonResult);
                     }
                 });
             }
@@ -685,7 +685,7 @@ function showResult() {
             } else {
                 progress.map((p, i) => {
                     if (ar_cur_lesson == p.lessonId) {
-                        progress.splice(index, 1, lessonResult);
+                        progress.splice(i, 1, lessonResult);
                     }
                 });
                 print('inserted arabic');
